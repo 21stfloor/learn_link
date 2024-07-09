@@ -49,7 +49,9 @@ class _UserListSmallWidgetState extends State<UserListSmallWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
+    return Visibility(
+      visible: widget.userRef?.role == FFAppConstants.userTypeStudent,
+      child: MouseRegion(
       opaque: false,
       cursor: MouseCursor.defer ?? MouseCursor.defer,
       child: AnimatedContainer(
@@ -116,8 +118,9 @@ class _UserListSmallWidgetState extends State<UserListSmallWidget> {
                               'A',
                             ).maybeHandleOverflow(maxChars: 1),
                             textAlign: TextAlign.center,
-                            style:
-                                FlutterFlowTheme.of(context).bodyLarge.override(
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyLarge
+                                  .override(
                                       fontFamily: 'Readex Pro',
                                       letterSpacing: 0.0,
                                       fontWeight: FontWeight.bold,
@@ -131,7 +134,8 @@ class _UserListSmallWidgetState extends State<UserListSmallWidget> {
               ),
               Expanded(
                 child: Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 8.0, 0.0),
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 8.0, 0.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -142,22 +146,24 @@ class _UserListSmallWidgetState extends State<UserListSmallWidget> {
                           widget.userRef?.displayName,
                           'Ghost User',
                         ),
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
+                          style:
+                              FlutterFlowTheme.of(context).bodyMedium.override(
                               fontFamily: 'Readex Pro',
                               letterSpacing: 0.0,
                               fontWeight: FontWeight.bold,
                             ),
                       ),
                       Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 0.0, 0.0),
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                              0.0, 4.0, 0.0, 0.0),
                         child: Text(
                           valueOrDefault<String>(
                             widget.userRef?.role,
                             '--',
                           ),
-                          style:
-                              FlutterFlowTheme.of(context).bodySmall.override(
+                            style: FlutterFlowTheme.of(context)
+                                .bodySmall
+                                .override(
                                     fontFamily: 'Readex Pro',
                                     color: FlutterFlowTheme.of(context).primary,
                                     letterSpacing: 0.0,
@@ -187,7 +193,8 @@ class _UserListSmallWidgetState extends State<UserListSmallWidget> {
                       child: Text(
                         'ME',
                         textAlign: TextAlign.center,
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
+                          style:
+                              FlutterFlowTheme.of(context).bodyMedium.override(
                               fontFamily: 'Readex Pro',
                               letterSpacing: 0.0,
                             ),
@@ -205,6 +212,7 @@ class _UserListSmallWidgetState extends State<UserListSmallWidget> {
       onExit: ((event) async {
         setState(() => _model.iuserHovered = false);
       }),
+      ),
     );
   }
 }

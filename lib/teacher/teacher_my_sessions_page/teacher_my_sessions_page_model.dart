@@ -1,7 +1,7 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/common/drawer_toggle/drawer_toggle_widget.dart';
-import '/flutter_flow/flutter_flow_icon_button.dart';
+import '/components/session_entry_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
@@ -29,16 +29,15 @@ class TeacherMySessionsPageModel
   int get tabBarCurrentIndex =>
       tabBarController != null ? tabBarController!.index : 0;
 
-  // Stores action output result for [Firestore Query - Query a collection] action in IconButton widget.
-  ChatsRecord? existingChatRef;
-  // Stores action output result for [Backend Call - Create Document] action in IconButton widget.
-  ChatsRecord? createdChatRef;
+  // Models for sessionEntry dynamic component.
+  late FlutterFlowDynamicModels<SessionEntryModel> sessionEntryModels;
   // Model for teacherSidebar component.
   late TeacherSidebarModel teacherSidebarModel;
 
   @override
   void initState(BuildContext context) {
     drawerToggleModel = createModel(context, () => DrawerToggleModel());
+    sessionEntryModels = FlutterFlowDynamicModels(() => SessionEntryModel());
     teacherSidebarModel = createModel(context, () => TeacherSidebarModel());
   }
 
@@ -47,6 +46,7 @@ class TeacherMySessionsPageModel
     unfocusNode.dispose();
     drawerToggleModel.dispose();
     tabBarController?.dispose();
+    sessionEntryModels.dispose();
     teacherSidebarModel.dispose();
   }
 }

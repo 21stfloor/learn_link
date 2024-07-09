@@ -1,4 +1,4 @@
-import '../../backend/schema/chats_record.dart';
+import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
@@ -55,27 +55,21 @@ class _VideoCallWidgetWidgetState extends State<VideoCallWidgetWidget> {
 
     String url = 'https://learnlinktokenserver.onrender.com/rtc/$channelName/$role/$tokenType/$uid';
     try {
-      final response = await http.get(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        String token = data['rtcToken'];
 
         setState(() {
           client = AgoraClient(
             agoraConnectionData: AgoraConnectionData(
               appId: appId,
               channelName: channelName,
-              tempToken: token,
+              // tempToken: token,
               uid: uid.hashCode,
+              tokenUrl: url
             ),
           );
           isClientInitialized = true;
           initAgora();
         });
-      } else {
-        print('Failed to load token. Status code: ${response.statusCode}');
-      }
+
     } catch (e) {
       print('Failed to load token. Error: $e');
     }

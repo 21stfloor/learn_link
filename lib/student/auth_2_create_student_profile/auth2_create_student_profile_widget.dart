@@ -1,3 +1,4 @@
+import '/auth/firebase_auth/auth_util.dart';
 import '/common/edit_profile_auth_2/edit_profile_auth2_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -33,6 +34,21 @@ class _Auth2CreateStudentProfileWidgetState
   void initState() {
     super.initState();
     _model = createModel(context, () => Auth2CreateStudentProfileModel());
+
+    // On page load action.
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      Function() _navigate = () {};
+      if (valueOrDefault(currentUserDocument?.role, '') !=
+          FFAppConstants.userTypeStudent) {
+        GoRouter.of(context).prepareAuthEvent();
+        await authManager.signOut();
+        GoRouter.of(context).clearRedirectLocation();
+
+        _navigate = () => context.goNamedAuth('auth_2_Login', context.mounted);
+      }
+
+      _navigate();
+    });
 
     animationsMap.addAll({
       'containerOnPageLoadAnimation': AnimationInfo(

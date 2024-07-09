@@ -46,6 +46,11 @@ class SessionsRecord extends FirestoreRecord {
   List<String> get notes => _notes ?? const [];
   bool hasNotes() => _notes != null;
 
+  // "videoCallStatus" field.
+  bool? _videoCallStatus;
+  bool get videoCallStatus => _videoCallStatus ?? false;
+  bool hasVideoCallStatus() => _videoCallStatus != null;
+
   void _initializeFields() {
     _teacher = snapshotData['teacher'] as DocumentReference?;
     _students = getDataList(snapshotData['students']);
@@ -53,6 +58,7 @@ class SessionsRecord extends FirestoreRecord {
     _schedule = snapshotData['schedule'] as DocumentReference?;
     _status = snapshotData['status'] as String?;
     _notes = getDataList(snapshotData['notes']);
+    _videoCallStatus = snapshotData['videoCallStatus'] as bool?;
   }
 
   static CollectionReference get collection =>
@@ -94,6 +100,7 @@ Map<String, dynamic> createSessionsRecordData({
   int? daysRemaining,
   DocumentReference? schedule,
   String? status,
+  bool? videoCallStatus,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -101,6 +108,7 @@ Map<String, dynamic> createSessionsRecordData({
       'daysRemaining': daysRemaining,
       'schedule': schedule,
       'status': status,
+      'videoCallStatus': videoCallStatus,
     }.withoutNulls,
   );
 
@@ -118,7 +126,8 @@ class SessionsRecordDocumentEquality implements Equality<SessionsRecord> {
         e1?.daysRemaining == e2?.daysRemaining &&
         e1?.schedule == e2?.schedule &&
         e1?.status == e2?.status &&
-        listEquality.equals(e1?.notes, e2?.notes);
+        listEquality.equals(e1?.notes, e2?.notes) &&
+        e1?.videoCallStatus == e2?.videoCallStatus;
   }
 
   @override
@@ -128,7 +137,8 @@ class SessionsRecordDocumentEquality implements Equality<SessionsRecord> {
         e?.daysRemaining,
         e?.schedule,
         e?.status,
-        e?.notes
+        e?.notes,
+        e?.videoCallStatus
       ]);
 
   @override

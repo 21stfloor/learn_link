@@ -9,6 +9,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/teacher/teacher_sidebar/teacher_sidebar_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -238,6 +239,48 @@ class _TeacherInSessionWidgetState extends State<TeacherInSessionWidget> {
                                       ),
                                     ),
                                   ),
+                                if (responsiveVisibility(
+                                  context: context,
+                                  tabletLandscape: false,
+                                  desktop: false,
+                                ))
+                                  Align(
+                                    alignment: AlignmentDirectional(1.0, -1.0),
+                                    child: FFButtonWidget(
+                                      onPressed: () {
+                                        print('Button pressed ...');
+                                      },
+                                      text: '',
+                                      icon: Icon(
+                                        Icons.fact_check,
+                                        size: 36.0,
+                                      ),
+                                      options: FFButtonOptions(
+                                        height: 40.0,
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            24.0, 0.0, 24.0, 0.0),
+                                        iconPadding:
+                                            EdgeInsetsDirectional.fromSTEB(
+                                                0.0, 0.0, 0.0, 0.0),
+                                        color: FlutterFlowTheme.of(context)
+                                            .primary,
+                                        textStyle: FlutterFlowTheme.of(context)
+                                            .titleSmall
+                                            .override(
+                                              fontFamily: 'Readex Pro',
+                                              color: Colors.white,
+                                              letterSpacing: 0.0,
+                                            ),
+                                        elevation: 3.0,
+                                        borderSide: BorderSide(
+                                          color: Colors.transparent,
+                                          width: 1.0,
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                    ),
+                                  ),
                                 FFButtonWidget(
                                   onPressed: () async {
                                     scaffoldKey.currentState!.openEndDrawer();
@@ -289,23 +332,120 @@ class _TeacherInSessionWidgetState extends State<TeacherInSessionWidget> {
                                     children: [
                                       Expanded(
                                         flex: 9,
-                                        child: wrapWithModel(
-                                          model: _model.videoCallWidgetModel,
-                                          updateCallback: () => setState(() {}),
-                                          child: VideoCallWidgetWidget(chatRef : _model.chatDoc!),
+                                        child: StreamBuilder<SessionsRecord>(
+                                          stream: SessionsRecord.getDocument(
+                                              _model.chatDoc!.chatSession!),
+                                          builder: (context, snapshot) {
+                                            // Customize what your widget looks like when it's loading.
+                                            if (!snapshot.hasData) {
+                                              return Center(
+                                                child: SizedBox(
+                                                  width: 50.0,
+                                                  height: 50.0,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    valueColor:
+                                                        AlwaysStoppedAnimation<
+                                                            Color>(
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .primary,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                            final conditionalBuilderSessionsRecord =
+                                                snapshot.data!;
+                                            return Builder(
+                                              builder: (context) {
+                                                if (conditionalBuilderSessionsRecord
+                                                    .videoCallStatus) {
+                                                  return wrapWithModel(
+                                                    model: _model
+                                                        .videoCallWidgetModel,
+                                                    updateCallback: () =>
+                                                        setState(() {}),
+                                                    child:
+                                                        VideoCallWidgetWidget(
+                                                      chatRef: _model.chatDoc!,
+                                                    ),
+                                                  );
+                                                } else {
+                                                  return RichText(
+                                                    textScaler:
+                                                        MediaQuery.of(context)
+                                                            .textScaler,
+                                                    text: TextSpan(
+                                                      children: [
+                                                        TextSpan(
+                                                          text: 'Video Call ',
+                                                          style: FlutterFlowTheme
+                                                                  .of(context)
+                                                              .titleMedium
+                                                              .override(
+                                                                fontFamily:
+                                                                    'Readex Pro',
+                                                                color: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .error,
+                                                                fontSize: 38.0,
+                                                                letterSpacing:
+                                                                    0.0,
+                                                              ),
+                                                        ),
+                                                        TextSpan(
+                                                          text:
+                                                              '\nis currently off',
+                                                          style: TextStyle(
+                                                            color: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .primaryText,
+                                                            fontSize: 36.0,
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text:
+                                                              '\nPlease wait for your tutor to start the video call',
+                                                          style: TextStyle(
+                                                            color: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .primaryText,
+                                                            fontSize: 16.0,
+                                                          ),
+                                                        )
+                                                      ],
+                                                      style: FlutterFlowTheme
+                                                              .of(context)
+                                                          .bodyMedium
+                                                          .override(
+                                                            fontFamily:
+                                                                'Readex Pro',
+                                                            letterSpacing: 0.0,
+                                                          ),
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                  );
+                                                }
+                                              },
+                                            );
+                                          },
                                         ),
                                       ),
+                                      Column(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
                                       if (responsiveVisibility(
                                         context: context,
                                         phone: false,
                                         tablet: false,
                                       ))
                                         Align(
-                                          alignment:
-                                              AlignmentDirectional(1.0, -1.0),
+                                              alignment: AlignmentDirectional(
+                                                  1.0, -1.0),
                                           child: Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(
                                                     0.0, 10.0, 0.0, 0.0),
                                             child: FFButtonWidget(
                                               onPressed: () async {
@@ -354,18 +494,70 @@ class _TeacherInSessionWidgetState extends State<TeacherInSessionWidget> {
                                               ),
                                               options: FFButtonOptions(
                                                 height: 40.0,
+                                                    padding:
+                                                        EdgeInsetsDirectional
+                                                            .fromSTEB(24.0, 0.0,
+                                                                24.0, 0.0),
+                                                    iconPadding:
+                                                        EdgeInsetsDirectional
+                                                            .fromSTEB(0.0, 0.0,
+                                                                0.0, 0.0),
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .secondary,
+                                                    textStyle: FlutterFlowTheme
+                                                            .of(context)
+                                                        .titleSmall
+                                                        .override(
+                                                          fontFamily:
+                                                              'Readex Pro',
+                                                          color: Colors.white,
+                                                          letterSpacing: 0.0,
+                                                        ),
+                                                    elevation: 3.0,
+                                                    borderSide: BorderSide(
+                                                      color: Colors.transparent,
+                                                      width: 1.0,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8.0),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          if (responsiveVisibility(
+                                            context: context,
+                                            phone: false,
+                                            tablet: false,
+                                          ))
+                                            Align(
+                                              alignment: AlignmentDirectional(
+                                                  1.0, -1.0),
+                                              child: FFButtonWidget(
+                                                onPressed: () {
+                                                  print('Button pressed ...');
+                                                },
+                                                text: '',
+                                                icon: Icon(
+                                                  Icons.fact_check,
+                                                  size: 36.0,
+                                                ),
+                                                options: FFButtonOptions(
+                                                  height: 40.0,
                                                 padding: EdgeInsetsDirectional
                                                     .fromSTEB(
                                                         24.0, 0.0, 24.0, 0.0),
                                                 iconPadding:
                                                     EdgeInsetsDirectional
-                                                        .fromSTEB(
-                                                            0.0, 0.0, 0.0, 0.0),
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .secondary,
+                                                          .fromSTEB(0.0, 0.0,
+                                                              0.0, 0.0),
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .primary,
                                                 textStyle:
-                                                    FlutterFlowTheme.of(context)
+                                                      FlutterFlowTheme.of(
+                                                              context)
                                                         .titleSmall
                                                         .override(
                                                           fontFamily:
@@ -379,10 +571,12 @@ class _TeacherInSessionWidgetState extends State<TeacherInSessionWidget> {
                                                   width: 1.0,
                                                 ),
                                                 borderRadius:
-                                                    BorderRadius.circular(8.0),
+                                                      BorderRadius.circular(
+                                                          8.0),
                                               ),
                                             ),
                                           ),
+                                        ].divide(SizedBox(height: 10.0)),
                                         ),
                                     ],
                                   ),

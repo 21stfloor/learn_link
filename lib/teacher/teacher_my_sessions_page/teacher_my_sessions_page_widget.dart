@@ -1,7 +1,7 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/common/drawer_toggle/drawer_toggle_widget.dart';
-import '/flutter_flow/flutter_flow_icon_button.dart';
+import '/components/session_entry_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
@@ -136,6 +136,7 @@ class _TeacherMySessionsPageWidgetState
                       Expanded(
                         child: TabBarView(
                           controller: _model.tabBarController,
+                          physics: const NeverScrollableScrollPhysics(),
                           children: [
                             Padding(
                               padding: EdgeInsets.all(16.0),
@@ -423,252 +424,28 @@ class _TeacherMySessionsPageWidgetState
                                                                   final listViewSessionsRecord =
                                                                       listViewSessionsRecordList[
                                                                           listViewIndex];
-                                                                  return Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0.0,
-                                                                            0.0,
-                                                                            0.0,
-                                                                            1.0),
-                                                                    child: StreamBuilder<
-                                                                        SchedulesRecord>(
-                                                                      stream: SchedulesRecord.getDocument(
+                                                                  return wrapWithModel(
+                                                                    model: _model
+                                                                        .sessionEntryModels
+                                                                        .getModel(
+                                                                      listViewSessionsRecord
+                                                                          .reference
+                                                                          .id,
+                                                                      listViewIndex,
+                                                                    ),
+                                                                    updateCallback: () =>
+                                                                        setState(
+                                                                            () {}),
+                                                                    child:
+                                                                        SessionEntryWidget(
+                                                                      key: Key(
+                                                                        'Key9a3_${listViewSessionsRecord.reference.id}',
+                                                                      ),
+                                                                      session:
+                                                                          listViewSessionsRecord,
+                                                                      scheduleRef:
                                                                           listViewSessionsRecord
-                                                                              .schedule!),
-                                                                      builder:
-                                                                          (context,
-                                                                              snapshot) {
-                                                                        // Customize what your widget looks like when it's loading.
-                                                                        if (!snapshot
-                                                                            .hasData) {
-                                                                          return Center(
-                                                                            child:
-                                                                                SizedBox(
-                                                                              width: 50.0,
-                                                                              height: 50.0,
-                                                                              child: CircularProgressIndicator(
-                                                                                valueColor: AlwaysStoppedAnimation<Color>(
-                                                                                  FlutterFlowTheme.of(context).primary,
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          );
-                                                                        }
-                                                                        final containerSchedulesRecord =
-                                                                            snapshot.data!;
-                                                                        return Container(
-                                                                          width:
-                                                                              100.0,
-                                                                          decoration:
-                                                                              BoxDecoration(
-                                                                            color:
-                                                                                FlutterFlowTheme.of(context).secondaryBackground,
-                                                                            boxShadow: [
-                                                                              BoxShadow(
-                                                                                blurRadius: 0.0,
-                                                                                color: FlutterFlowTheme.of(context).primaryBackground,
-                                                                                offset: Offset(
-                                                                                  0.0,
-                                                                                  1.0,
-                                                                                ),
-                                                                              )
-                                                                            ],
-                                                                          ),
-                                                                          child:
-                                                                              Padding(
-                                                                            padding: EdgeInsetsDirectional.fromSTEB(
-                                                                                16.0,
-                                                                                0.0,
-                                                                                16.0,
-                                                                                0.0),
-                                                                            child:
-                                                                                Row(
-                                                                              mainAxisSize: MainAxisSize.max,
-                                                                              children: [
-                                                                                Expanded(
-                                                                                  flex: 3,
-                                                                                  child: Text(
-                                                                                    listViewSessionsRecord.reference.id.hashCode.toString(),
-                                                                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                          fontFamily: 'Readex Pro',
-                                                                                          letterSpacing: 0.0,
-                                                                                        ),
-                                                                                  ),
-                                                                                ),
-                                                                                Expanded(
-                                                                                  flex: 3,
-                                                                                  child: Text(
-                                                                                    containerSchedulesRecord.subject,
-                                                                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                          fontFamily: 'Readex Pro',
-                                                                                          letterSpacing: 0.0,
-                                                                                        ),
-                                                                                  ),
-                                                                                ),
-                                                                                Expanded(
-                                                                                  flex: 3,
-                                                                                  child: Text(
-                                                                                    containerSchedulesRecord.day,
-                                                                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                          fontFamily: 'Readex Pro',
-                                                                                          letterSpacing: 0.0,
-                                                                                        ),
-                                                                                  ),
-                                                                                ),
-                                                                                Expanded(
-                                                                                  flex: 3,
-                                                                                  child: Text(
-                                                                                    dateTimeFormat('jm', containerSchedulesRecord.startTime!),
-                                                                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                          fontFamily: 'Readex Pro',
-                                                                                          letterSpacing: 0.0,
-                                                                                        ),
-                                                                                  ),
-                                                                                ),
-                                                                                Expanded(
-                                                                                  flex: 3,
-                                                                                  child: Text(
-                                                                                    dateTimeFormat('jm', containerSchedulesRecord.endTime!),
-                                                                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                          fontFamily: 'Readex Pro',
-                                                                                          letterSpacing: 0.0,
-                                                                                        ),
-                                                                                  ),
-                                                                                ),
-                                                                                Expanded(
-                                                                                  flex: 3,
-                                                                                  child: Text(
-                                                                                    listViewSessionsRecord.daysRemaining.toString(),
-                                                                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                          fontFamily: 'Readex Pro',
-                                                                                          letterSpacing: 0.0,
-                                                                                        ),
-                                                                                  ),
-                                                                                ),
-                                                                                Expanded(
-                                                                                  flex: 3,
-                                                                                  child: Text(
-                                                                                    listViewSessionsRecord.students.length.toString(),
-                                                                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                          fontFamily: 'Readex Pro',
-                                                                                          letterSpacing: 0.0,
-                                                                                        ),
-                                                                                  ),
-                                                                                ),
-                                                                                Expanded(
-                                                                                  flex: 3,
-                                                                                  child: Row(
-                                                                                    mainAxisSize: MainAxisSize.max,
-                                                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                                                    children: [
-                                                                                      FlutterFlowIconButton(
-                                                                                        borderColor: Colors.transparent,
-                                                                                        borderRadius: 30.0,
-                                                                                        borderWidth: 1.0,
-                                                                                        buttonSize: 44.0,
-                                                                                        icon: Icon(
-                                                                                          Icons.edit,
-                                                                                          color: FlutterFlowTheme.of(context).secondaryText,
-                                                                                          size: 20.0,
-                                                                                        ),
-                                                                                        onPressed: () async {
-                                                                                          await showDialog(
-                                                                                            context: context,
-                                                                                            builder: (alertDialogContext) {
-                                                                                              return WebViewAware(
-                                                                                                child: AlertDialog(
-                                                                                                  title: Text('Invalid'),
-                                                                                                  content: Text('Not yet implemented'),
-                                                                                                  actions: [
-                                                                                                    TextButton(
-                                                                                                      onPressed: () => Navigator.pop(alertDialogContext),
-                                                                                                      child: Text('Ok'),
-                                                                                                    ),
-                                                                                                  ],
-                                                                                                ),
-                                                                                              );
-                                                                                            },
-                                                                                          );
-                                                                                        },
-                                                                                      ),
-                                                                                      FlutterFlowIconButton(
-                                                                                        borderColor: FlutterFlowTheme.of(context).primary,
-                                                                                        borderRadius: 20.0,
-                                                                                        borderWidth: 1.0,
-                                                                                        buttonSize: 40.0,
-                                                                                        fillColor: FlutterFlowTheme.of(context).accent1,
-                                                                                        icon: Icon(
-                                                                                          Icons.double_arrow_outlined,
-                                                                                          color: FlutterFlowTheme.of(context).primaryText,
-                                                                                          size: 24.0,
-                                                                                        ),
-                                                                                        onPressed: () async {
-                                                                                          _model.existingChatRef = await queryChatsRecordOnce(
-                                                                                            queryBuilder: (chatsRecord) => chatsRecord.where(
-                                                                                              'chatSession',
-                                                                                              isEqualTo: listViewSessionsRecord.reference,
-                                                                                            ),
-                                                                                            singleRecord: true,
-                                                                                          ).then((s) => s.firstOrNull);
-                                                                                          if (_model.existingChatRef != null) {
-                                                                                            context.pushNamed(
-                                                                                              'teacherInSession',
-                                                                                              queryParameters: {
-                                                                                                'chatRef': serializeParam(
-                                                                                                  _model.existingChatRef?.reference,
-                                                                                                  ParamType.DocumentReference,
-                                                                                                ),
-                                                                                              }.withoutNulls,
-                                                                                            );
-                                                                                          } else {
-                                                                                            var chatsRecordReference = ChatsRecord.collection.doc();
-                                                                                            await chatsRecordReference.set({
-                                                                                              ...createChatsRecordData(
-                                                                                                userA: currentUserReference,
-                                                                                                groupChatId: listViewSessionsRecord.reference.id.hashCode,
-                                                                                                chatSession: listViewSessionsRecord.reference,
-                                                                                              ),
-                                                                                              ...mapToFirestore(
-                                                                                                {
-                                                                                                  'last_message_time': FieldValue.serverTimestamp(),
-                                                                                                },
-                                                                                              ),
-                                                                                            });
-                                                                                            _model.createdChatRef = ChatsRecord.getDocumentFromData({
-                                                                                              ...createChatsRecordData(
-                                                                                                userA: currentUserReference,
-                                                                                                groupChatId: listViewSessionsRecord.reference.id.hashCode,
-                                                                                                chatSession: listViewSessionsRecord.reference,
-                                                                                              ),
-                                                                                              ...mapToFirestore(
-                                                                                                {
-                                                                                                  'last_message_time': DateTime.now(),
-                                                                                                },
-                                                                                              ),
-                                                                                            }, chatsRecordReference);
-
-                                                                                            context.pushNamed(
-                                                                                              'teacherInSession',
-                                                                                              queryParameters: {
-                                                                                                'chatRef': serializeParam(
-                                                                                                  _model.createdChatRef?.reference,
-                                                                                                  ParamType.DocumentReference,
-                                                                                                ),
-                                                                                              }.withoutNulls,
-                                                                                            );
-                                                                                          }
-
-                                                                                          setState(() {});
-                                                                                        },
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                ),
-                                                                              ],
-                                                                            ),
-                                                                          ),
-                                                                        );
-                                                                      },
+                                                                              .schedule,
                                                                     ),
                                                                   );
                                                                 },
