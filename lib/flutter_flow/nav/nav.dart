@@ -79,15 +79,19 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
       initialLocation: '/',
       debugLogDiagnostics: true,
       refreshListenable: appStateNotifier,
-      errorBuilder: (context, state) =>
+      errorBuilder: (context, state) => RootPageContext.wrap(
           appStateNotifier.loggedIn ? RedirectionWidget() : Auth2LoginWidget(),
+        errorRoute: state.uri.toString(),
+      ),
       routes: [
         FFRoute(
           name: '_initialize',
           path: '/',
-          builder: (context, _) => appStateNotifier.loggedIn
+          builder: (context, _) => RootPageContext.wrap(
+            appStateNotifier.loggedIn
               ? RedirectionWidget()
               : Auth2LoginWidget(),
+        ),
         ),
         FFRoute(
           name: 'auth_2_CreateAccount',
@@ -274,15 +278,23 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           ),
         ),
         FFRoute(
-          name: 'VideoCallPage',
-          path: '/videoCallPage',
-          builder: (context, params) => VideoCallPageWidget(),
-        ),
-        FFRoute(
           name: 'studentInSession',
           path: '/studentInSession',
           requireAuth: true,
           builder: (context, params) => StudentInSessionWidget(
+            chatRef: params.getParam(
+              'chatRef',
+              ParamType.DocumentReference,
+              isList: false,
+              collectionNamePath: ['chats'],
+            ),
+          ),
+        ),
+        FFRoute(
+          name: 'teacherInSession',
+          path: '/teacherInSession',
+          requireAuth: true,
+          builder: (context, params) => TeacherInSessionWidget(
             chatRef: params.getParam(
               'chatRef',
               ParamType.DocumentReference,

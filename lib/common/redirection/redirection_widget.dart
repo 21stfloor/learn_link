@@ -28,6 +28,9 @@ class _RedirectionWidgetState extends State<RedirectionWidget> {
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
+      if (RootPageContext.isInactiveRootPage(context)) {
+        return;
+      }
       if (valueOrDefault(currentUserDocument?.role, '') ==
           FFAppConstants.userTypeStudent) {
         context.goNamed('studentMySessions');

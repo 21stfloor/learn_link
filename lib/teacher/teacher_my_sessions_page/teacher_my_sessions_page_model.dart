@@ -29,6 +29,10 @@ class TeacherMySessionsPageModel
   int get tabBarCurrentIndex =>
       tabBarController != null ? tabBarController!.index : 0;
 
+  // Stores action output result for [Firestore Query - Query a collection] action in IconButton widget.
+  ChatsRecord? existingChatRef;
+  // Stores action output result for [Backend Call - Create Document] action in IconButton widget.
+  ChatsRecord? createdChatRef;
   // Model for teacherSidebar component.
   late TeacherSidebarModel teacherSidebarModel;
 

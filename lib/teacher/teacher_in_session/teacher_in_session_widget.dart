@@ -1,25 +1,24 @@
-import '../../common/video_call_widget/video_call_widget_widget.dart';
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/chat_groupwbubbles/chat_details_overlay/chat_details_overlay_widget.dart';
 import '/chat_groupwbubbles/chat_thread_component/chat_thread_component_widget.dart';
 import '/common/drawer_toggle/drawer_toggle_widget.dart';
+import '/common/video_call_widget/video_call_widget_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import '/student/student_sidebar/student_sidebar_widget.dart';
+import '/teacher/teacher_sidebar/teacher_sidebar_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:webviewx_plus/webviewx_plus.dart';
-import 'student_in_session_model.dart';
-export 'student_in_session_model.dart';
+import 'teacher_in_session_model.dart';
+export 'teacher_in_session_model.dart';
 
-class StudentInSessionWidget extends StatefulWidget {
-  const StudentInSessionWidget({
+class TeacherInSessionWidget extends StatefulWidget {
+  const TeacherInSessionWidget({
     super.key,
     this.chatRef,
   });
@@ -27,32 +26,22 @@ class StudentInSessionWidget extends StatefulWidget {
   final DocumentReference? chatRef;
 
   @override
-  State<StudentInSessionWidget> createState() => _StudentInSessionWidgetState();
+  State<TeacherInSessionWidget> createState() => _TeacherInSessionWidgetState();
 }
 
-class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
-  late StudentInSessionModel _model;
+class _TeacherInSessionWidgetState extends State<TeacherInSessionWidget> {
+  late TeacherInSessionModel _model;
+  var _isReady = false;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
-
-  var _isReady = false;
 
   @override
   void initState() {
     super.initState();
-    _model = createModel(context, () => StudentInSessionModel());
+    _model = createModel(context, () => TeacherInSessionModel());
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      _model.existingStudentProfile = await queryStudentProfileRecordOnce(
-        parent: currentUserReference,
-        singleRecord: true,
-      ).then((s) => s.firstOrNull);
-      if (_model.existingStudentProfile?.reference == null) {
-        context.goNamed('auth_2_createStudentProfile');
-
-        return;
-      } else {
         _model.chatDoc = await ChatsRecord.getDocumentOnce(widget.chatRef!);
         setState(() {
           _isReady = true;
@@ -66,7 +55,6 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
             ),
           });
         }
-      }
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
@@ -92,9 +80,9 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
           elevation: 16.0,
           child: WebViewAware(
             child: wrapWithModel(
-              model: _model.studentSidebarModel,
+              model: _model.teacherSidebarModel,
               updateCallback: () => setState(() {}),
-              child: StudentSidebarWidget(),
+              child: TeacherSidebarWidget(),
             ),
           ),
         ),
@@ -139,7 +127,7 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                   updateCallback: () => setState(() {}),
                   child: DrawerToggleWidget(),
                 ),
-              _isReady? Expanded(
+              _isReady?Expanded(
                 flex: 10,
                 child: Align(
                   alignment: AlignmentDirectional(0.0, 0.0),
@@ -191,26 +179,26 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                                         await showModalBottomSheet(
                                           isScrollControlled: true,
                                           backgroundColor:
-                                          FlutterFlowTheme.of(context)
-                                              .accent4,
+                                              FlutterFlowTheme.of(context)
+                                                  .accent4,
                                           barrierColor: Color(0x00FFFFFF),
                                           context: context,
                                           builder: (context) {
                                             return WebViewAware(
                                               child: GestureDetector(
                                                 onTap: () => _model.unfocusNode
-                                                    .canRequestFocus
+                                                        .canRequestFocus
                                                     ? FocusScope.of(context)
-                                                    .requestFocus(
-                                                    _model.unfocusNode)
+                                                        .requestFocus(
+                                                            _model.unfocusNode)
                                                     : FocusScope.of(context)
-                                                    .unfocus(),
+                                                        .unfocus(),
                                                 child: Padding(
                                                   padding:
-                                                  MediaQuery.viewInsetsOf(
-                                                      context),
+                                                      MediaQuery.viewInsetsOf(
+                                                          context),
                                                   child:
-                                                  ChatDetailsOverlayWidget(
+                                                      ChatDetailsOverlayWidget(
                                                     chatRef: _model.chatDoc!,
                                                   ),
                                                 ),
@@ -229,24 +217,24 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                                         padding: EdgeInsetsDirectional.fromSTEB(
                                             24.0, 0.0, 24.0, 0.0),
                                         iconPadding:
-                                        EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 0.0, 0.0, 0.0),
+                                            EdgeInsetsDirectional.fromSTEB(
+                                                0.0, 0.0, 0.0, 0.0),
                                         color: FlutterFlowTheme.of(context)
                                             .secondary,
                                         textStyle: FlutterFlowTheme.of(context)
                                             .titleSmall
                                             .override(
-                                          fontFamily: 'Readex Pro',
-                                          color: Colors.white,
-                                          letterSpacing: 0.0,
-                                        ),
+                                              fontFamily: 'Readex Pro',
+                                              color: Colors.white,
+                                              letterSpacing: 0.0,
+                                            ),
                                         elevation: 3.0,
                                         borderSide: BorderSide(
                                           color: Colors.transparent,
                                           width: 1.0,
                                         ),
                                         borderRadius:
-                                        BorderRadius.circular(8.0),
+                                            BorderRadius.circular(8.0),
                                       ),
                                     ),
                                   ),
@@ -272,11 +260,11 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                                     textStyle: FlutterFlowTheme.of(context)
                                         .titleSmall
                                         .override(
-                                      fontFamily: 'Readex Pro',
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryBackground,
-                                      letterSpacing: 0.0,
-                                    ),
+                                          fontFamily: 'Readex Pro',
+                                          color: FlutterFlowTheme.of(context)
+                                              .secondaryBackground,
+                                          letterSpacing: 0.0,
+                                        ),
                                     elevation: 3.0,
                                     borderSide: BorderSide(
                                       color: Colors.transparent,
@@ -293,7 +281,7 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                                 child: Container(
                                   width: MediaQuery.sizeOf(context).width * 1.0,
                                   height:
-                                  MediaQuery.sizeOf(context).height * 1.0,
+                                      MediaQuery.sizeOf(context).height * 1.0,
                                   decoration: BoxDecoration(),
                                   alignment: AlignmentDirectional(0.0, 0.0),
                                   child: Row(
@@ -304,8 +292,7 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                                         child: wrapWithModel(
                                           model: _model.videoCallWidgetModel,
                                           updateCallback: () => setState(() {}),
-                                          child: VideoCallWidgetWidget(chatRef:
-                                          _model.chatDoc!),
+                                          child: VideoCallWidgetWidget(chatRef : _model.chatDoc!),
                                         ),
                                       ),
                                       if (responsiveVisibility(
@@ -315,43 +302,43 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                                       ))
                                         Align(
                                           alignment:
-                                          AlignmentDirectional(1.0, -1.0),
+                                              AlignmentDirectional(1.0, -1.0),
                                           child: Padding(
                                             padding:
-                                            EdgeInsetsDirectional.fromSTEB(
-                                                0.0, 10.0, 0.0, 0.0),
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    0.0, 10.0, 0.0, 0.0),
                                             child: FFButtonWidget(
                                               onPressed: () async {
                                                 await showModalBottomSheet(
                                                   isScrollControlled: true,
                                                   backgroundColor:
-                                                  FlutterFlowTheme.of(
-                                                      context)
-                                                      .accent4,
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .accent4,
                                                   barrierColor:
-                                                  Color(0x00FFFFFF),
+                                                      Color(0x00FFFFFF),
                                                   context: context,
                                                   builder: (context) {
                                                     return WebViewAware(
                                                       child: GestureDetector(
                                                         onTap: () => _model
-                                                            .unfocusNode
-                                                            .canRequestFocus
+                                                                .unfocusNode
+                                                                .canRequestFocus
                                                             ? FocusScope.of(
-                                                            context)
-                                                            .requestFocus(_model
-                                                            .unfocusNode)
+                                                                    context)
+                                                                .requestFocus(_model
+                                                                    .unfocusNode)
                                                             : FocusScope.of(
-                                                            context)
-                                                            .unfocus(),
+                                                                    context)
+                                                                .unfocus(),
                                                         child: Padding(
                                                           padding: MediaQuery
                                                               .viewInsetsOf(
-                                                              context),
+                                                                  context),
                                                           child:
-                                                          ChatDetailsOverlayWidget(
+                                                              ChatDetailsOverlayWidget(
                                                             chatRef:
-                                                            _model.chatDoc!,
+                                                                _model.chatDoc!,
                                                           ),
                                                         ),
                                                       ),
@@ -369,30 +356,30 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                                                 height: 40.0,
                                                 padding: EdgeInsetsDirectional
                                                     .fromSTEB(
-                                                    24.0, 0.0, 24.0, 0.0),
+                                                        24.0, 0.0, 24.0, 0.0),
                                                 iconPadding:
-                                                EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                    0.0, 0.0, 0.0, 0.0),
+                                                    EdgeInsetsDirectional
+                                                        .fromSTEB(
+                                                            0.0, 0.0, 0.0, 0.0),
                                                 color:
-                                                FlutterFlowTheme.of(context)
-                                                    .secondary,
+                                                    FlutterFlowTheme.of(context)
+                                                        .secondary,
                                                 textStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .titleSmall
-                                                    .override(
-                                                  fontFamily:
-                                                  'Readex Pro',
-                                                  color: Colors.white,
-                                                  letterSpacing: 0.0,
-                                                ),
+                                                    FlutterFlowTheme.of(context)
+                                                        .titleSmall
+                                                        .override(
+                                                          fontFamily:
+                                                              'Readex Pro',
+                                                          color: Colors.white,
+                                                          letterSpacing: 0.0,
+                                                        ),
                                                 elevation: 3.0,
                                                 borderSide: BorderSide(
                                                   color: Colors.transparent,
                                                   width: 1.0,
                                                 ),
                                                 borderRadius:
-                                                BorderRadius.circular(8.0),
+                                                    BorderRadius.circular(8.0),
                                               ),
                                             ),
                                           ),
@@ -408,8 +395,7 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                     ),
                   ),
                 ),
-              ): Container()
-              ,
+              ):Container(),
             ],
           ),
         ),

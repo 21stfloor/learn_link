@@ -1,4 +1,4 @@
-import '../backend/schema/chats_record.dart';
+import '../../backend/schema/chats_record.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +27,12 @@ class _VideoCallWidgetWidgetState extends State<VideoCallWidgetWidget> {
   late VideoCallWidgetModel _model;
   late AgoraClient client;
   bool isClientInitialized = false;
+
+  @override
+  void setState(VoidCallback callback) {
+    super.setState(callback);
+    _model.onUpdate();
+  }
 
   @override
   void initState() {

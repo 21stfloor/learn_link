@@ -7,30 +7,27 @@ import '/common/video_call_widget/video_call_widget_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import '/student/student_sidebar/student_sidebar_widget.dart';
-import 'student_in_session_widget.dart' show StudentInSessionWidget;
+import '/teacher/teacher_sidebar/teacher_sidebar_widget.dart';
+import 'teacher_in_session_widget.dart' show TeacherInSessionWidget;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:webviewx_plus/webviewx_plus.dart';
 
-class StudentInSessionModel extends FlutterFlowModel<StudentInSessionWidget> {
+class TeacherInSessionModel extends FlutterFlowModel<TeacherInSessionWidget> {
   ///  State fields for stateful widgets in this page.
 
   final unfocusNode = FocusNode();
-  // Stores action output result for [Firestore Query - Query a collection] action in studentInSession widget.
-  StudentProfileRecord? existingStudentProfile;
-  // Stores action output result for [Backend Call - Read Document] action in studentInSession widget.
+  // Stores action output result for [Backend Call - Read Document] action in teacherInSession widget.
   ChatsRecord? chatDoc;
   // Model for drawerToggle component.
   late DrawerToggleModel drawerToggleModel;
   // Model for videoCallWidget component.
   late VideoCallWidgetModel videoCallWidgetModel;
-  // Model for studentSidebar component.
-  late StudentSidebarModel studentSidebarModel;
+  // Model for teacherSidebar component.
+  late TeacherSidebarModel teacherSidebarModel;
   // Model for chat_ThreadComponent component.
   late ChatThreadComponentModel chatThreadComponentModel;
 
@@ -38,7 +35,7 @@ class StudentInSessionModel extends FlutterFlowModel<StudentInSessionWidget> {
   void initState(BuildContext context) {
     drawerToggleModel = createModel(context, () => DrawerToggleModel());
     videoCallWidgetModel = createModel(context, () => VideoCallWidgetModel());
-    studentSidebarModel = createModel(context, () => StudentSidebarModel());
+    teacherSidebarModel = createModel(context, () => TeacherSidebarModel());
     chatThreadComponentModel =
         createModel(context, () => ChatThreadComponentModel());
   }
@@ -48,7 +45,7 @@ class StudentInSessionModel extends FlutterFlowModel<StudentInSessionWidget> {
     unfocusNode.dispose();
     drawerToggleModel.dispose();
     videoCallWidgetModel.dispose();
-    studentSidebarModel.dispose();
+    teacherSidebarModel.dispose();
     chatThreadComponentModel.dispose();
   }
 }

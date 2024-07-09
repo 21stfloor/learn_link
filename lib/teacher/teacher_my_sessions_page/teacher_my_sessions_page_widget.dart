@@ -196,7 +196,7 @@ class _TeacherMySessionsPageWidgetState
                                                         AlignmentDirectional(
                                                             0.0, 0.0),
                                                     child: Container(
-                                                      width: 920.0,
+                                                      width: 1024.0,
                                                       height: MediaQuery.sizeOf(
                                                                   context)
                                                               .height *
@@ -589,6 +589,76 @@ class _TeacherMySessionsPageWidgetState
                                                                                               );
                                                                                             },
                                                                                           );
+                                                                                        },
+                                                                                      ),
+                                                                                      FlutterFlowIconButton(
+                                                                                        borderColor: FlutterFlowTheme.of(context).primary,
+                                                                                        borderRadius: 20.0,
+                                                                                        borderWidth: 1.0,
+                                                                                        buttonSize: 40.0,
+                                                                                        fillColor: FlutterFlowTheme.of(context).accent1,
+                                                                                        icon: Icon(
+                                                                                          Icons.double_arrow_outlined,
+                                                                                          color: FlutterFlowTheme.of(context).primaryText,
+                                                                                          size: 24.0,
+                                                                                        ),
+                                                                                        onPressed: () async {
+                                                                                          _model.existingChatRef = await queryChatsRecordOnce(
+                                                                                            queryBuilder: (chatsRecord) => chatsRecord.where(
+                                                                                              'chatSession',
+                                                                                              isEqualTo: listViewSessionsRecord.reference,
+                                                                                            ),
+                                                                                            singleRecord: true,
+                                                                                          ).then((s) => s.firstOrNull);
+                                                                                          if (_model.existingChatRef != null) {
+                                                                                            context.pushNamed(
+                                                                                              'teacherInSession',
+                                                                                              queryParameters: {
+                                                                                                'chatRef': serializeParam(
+                                                                                                  _model.existingChatRef?.reference,
+                                                                                                  ParamType.DocumentReference,
+                                                                                                ),
+                                                                                              }.withoutNulls,
+                                                                                            );
+                                                                                          } else {
+                                                                                            var chatsRecordReference = ChatsRecord.collection.doc();
+                                                                                            await chatsRecordReference.set({
+                                                                                              ...createChatsRecordData(
+                                                                                                userA: currentUserReference,
+                                                                                                groupChatId: listViewSessionsRecord.reference.id.hashCode,
+                                                                                                chatSession: listViewSessionsRecord.reference,
+                                                                                              ),
+                                                                                              ...mapToFirestore(
+                                                                                                {
+                                                                                                  'last_message_time': FieldValue.serverTimestamp(),
+                                                                                                },
+                                                                                              ),
+                                                                                            });
+                                                                                            _model.createdChatRef = ChatsRecord.getDocumentFromData({
+                                                                                              ...createChatsRecordData(
+                                                                                                userA: currentUserReference,
+                                                                                                groupChatId: listViewSessionsRecord.reference.id.hashCode,
+                                                                                                chatSession: listViewSessionsRecord.reference,
+                                                                                              ),
+                                                                                              ...mapToFirestore(
+                                                                                                {
+                                                                                                  'last_message_time': DateTime.now(),
+                                                                                                },
+                                                                                              ),
+                                                                                            }, chatsRecordReference);
+
+                                                                                            context.pushNamed(
+                                                                                              'teacherInSession',
+                                                                                              queryParameters: {
+                                                                                                'chatRef': serializeParam(
+                                                                                                  _model.createdChatRef?.reference,
+                                                                                                  ParamType.DocumentReference,
+                                                                                                ),
+                                                                                              }.withoutNulls,
+                                                                                            );
+                                                                                          }
+
+                                                                                          setState(() {});
                                                                                         },
                                                                                       ),
                                                                                     ],
