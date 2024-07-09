@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "645373172680",
+    "project_id": "learn-link-el7ijg",
+    "storage_bucket": "learn-link-el7ijg.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:645373172680:android:3d3751edc099d25814befd",
+        "android_client_info": {
+          "package_name": "com.thesis.learnlink"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYm6qb5gDk3E-NeMop1SgmFoLMeqehBQQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
