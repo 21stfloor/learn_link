@@ -2,7 +2,6 @@ import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/flutter_flow_toggle_icon.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
@@ -43,7 +42,7 @@ class _SessionEntryWidgetState extends State<SessionEntryWidget> {
 
     // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      _model.videoCallStatus = widget.session!.videoCallStatus;
+      _model.videoCallStatus = widget!.session!.videoCallStatus;
       setState(() {});
     });
 
@@ -62,7 +61,7 @@ class _SessionEntryWidgetState extends State<SessionEntryWidget> {
     return Padding(
       padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 1.0),
       child: StreamBuilder<SchedulesRecord>(
-        stream: SchedulesRecord.getDocument(widget.scheduleRef!),
+        stream: SchedulesRecord.getDocument(widget!.scheduleRef!),
         builder: (context, snapshot) {
           // Customize what your widget looks like when it's loading.
           if (!snapshot.hasData) {
@@ -103,7 +102,7 @@ class _SessionEntryWidgetState extends State<SessionEntryWidget> {
                   Expanded(
                     flex: 3,
                     child: Text(
-                      widget.session!.reference.id.hashCode.toString(),
+                      widget!.session!.reference.id.hashCode.toString(),
                       style: FlutterFlowTheme.of(context).bodyMedium.override(
                             fontFamily: 'Readex Pro',
                             letterSpacing: 0.0,
@@ -154,7 +153,7 @@ class _SessionEntryWidgetState extends State<SessionEntryWidget> {
                     flex: 3,
                     child: Text(
                       valueOrDefault<String>(
-                        widget.session?.daysRemaining?.toString(),
+                        widget!.session?.daysRemaining?.toString(),
                         '0',
                       ),
                       style: FlutterFlowTheme.of(context).bodyMedium.override(
@@ -167,7 +166,7 @@ class _SessionEntryWidgetState extends State<SessionEntryWidget> {
                     flex: 3,
                     child: Text(
                       valueOrDefault<String>(
-                        widget.session?.students?.length?.toString(),
+                        widget!.session?.students?.length?.toString(),
                         '0',
                       ),
                       style: FlutterFlowTheme.of(context).bodyMedium.override(
@@ -180,7 +179,7 @@ class _SessionEntryWidgetState extends State<SessionEntryWidget> {
                     flex: 3,
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         FlutterFlowIconButton(
                           borderColor: FlutterFlowTheme.of(context).primary,
@@ -194,23 +193,31 @@ class _SessionEntryWidgetState extends State<SessionEntryWidget> {
                             size: 24.0,
                           ),
                           onPressed: () async {
+                            var _shouldSetState = false;
                             _model.existingChatRef = await queryChatsRecordOnce(
                               queryBuilder: (chatsRecord) => chatsRecord.where(
                                 'chatSession',
-                                isEqualTo: widget.session?.reference,
+                                isEqualTo: widget!.session?.reference,
                               ),
                               singleRecord: true,
                             ).then((s) => s.firstOrNull);
+                            _shouldSetState = true;
                             if (_model.existingChatRef != null) {
                               context.pushNamed(
                                 'teacherInSession',
                                 queryParameters: {
-                                  'chatRef': serializeParam(
-                                    _model.existingChatRef?.reference,
-                                    ParamType.DocumentReference,
+                                  'chatDoc': serializeParam(
+                                    _model.existingChatRef,
+                                    ParamType.Document,
                                   ),
                                 }.withoutNulls,
+                                extra: <String, dynamic>{
+                                  'chatDoc': _model.existingChatRef,
+                                },
                               );
+
+                              if (_shouldSetState) setState(() {});
+                              return;
                             } else {
                               var chatsRecordReference =
                                   ChatsRecord.collection.doc();
@@ -218,8 +225,8 @@ class _SessionEntryWidgetState extends State<SessionEntryWidget> {
                                 ...createChatsRecordData(
                                   userA: currentUserReference,
                                   groupChatId:
-                                      widget.session!.reference.id.hashCode,
-                                  chatSession: widget.session?.reference,
+                                      widget!.session!.reference.id.hashCode,
+                                  chatSession: widget!.session?.reference,
                                 ),
                                 ...mapToFirestore(
                                   {
@@ -233,8 +240,8 @@ class _SessionEntryWidgetState extends State<SessionEntryWidget> {
                                 ...createChatsRecordData(
                                   userA: currentUserReference,
                                   groupChatId:
-                                      widget.session!.reference.id.hashCode,
-                                  chatSession: widget.session?.reference,
+                                      widget!.session!.reference.id.hashCode,
+                                  chatSession: widget!.session?.reference,
                                 ),
                                 ...mapToFirestore(
                                   {
@@ -242,46 +249,75 @@ class _SessionEntryWidgetState extends State<SessionEntryWidget> {
                                   },
                                 ),
                               }, chatsRecordReference);
+                              _shouldSetState = true;
 
                               context.pushNamed(
                                 'teacherInSession',
                                 queryParameters: {
-                                  'chatRef': serializeParam(
-                                    _model.createdChatRef?.reference,
-                                    ParamType.DocumentReference,
+                                  'chatDoc': serializeParam(
+                                    _model.createdChatRef,
+                                    ParamType.Document,
                                   ),
                                 }.withoutNulls,
+                                extra: <String, dynamic>{
+                                  'chatDoc': _model.createdChatRef,
+                                },
                               );
+
+                              if (_shouldSetState) setState(() {});
+                              return;
                             }
 
-                            setState(() {});
+                            if (_shouldSetState) setState(() {});
                           },
                         ),
-                        ToggleIcon(
+                        if (!_model.videoCallStatus)
+                          FlutterFlowIconButton(
+                            borderColor: FlutterFlowTheme.of(context).error,
+                            borderRadius: 20.0,
+                            borderWidth: 1.0,
+                            buttonSize: 40.0,
+                            fillColor:
+                                FlutterFlowTheme.of(context).primaryBackground,
+                            icon: Icon(
+                              Icons.videocam_off,
+                              color: FlutterFlowTheme.of(context).error,
+                              size: 24.0,
+                            ),
                           onPressed: () async {
-                            setState(() => _model.videoCallStatus =
-                                !_model.videoCallStatus);
-                            _model.videoCallStatus = !_model.videoCallStatus;
+                              _model.videoCallStatus = true;
                             setState(() {});
 
-                            await widget.session!.reference
+                              await widget!.session!.reference
                                 .update(createSessionsRecordData(
                               videoCallStatus: _model.videoCallStatus,
                             ));
                           },
-                          value: _model.videoCallStatus,
-                          onIcon: Icon(
+                          ),
+                        if (_model.videoCallStatus)
+                          FlutterFlowIconButton(
+                            borderColor: FlutterFlowTheme.of(context).primary,
+                            borderRadius: 20.0,
+                            borderWidth: 1.0,
+                            buttonSize: 40.0,
+                            fillColor:
+                                FlutterFlowTheme.of(context).primaryBackground,
+                            icon: Icon(
                             Icons.video_chat_sharp,
                             color: FlutterFlowTheme.of(context).primary,
-                            size: 25.0,
+                              size: 24.0,
                           ),
-                          offIcon: Icon(
-                            Icons.videocam_off_sharp,
-                            color: FlutterFlowTheme.of(context).error,
-                            size: 25.0,
-                          ),
+                            onPressed: () async {
+                              _model.videoCallStatus = false;
+                              setState(() {});
+
+                              await widget!.session!.reference
+                                  .update(createSessionsRecordData(
+                                videoCallStatus: _model.videoCallStatus,
+                              ));
+                            },
                         ),
-                      ],
+                      ].divide(SizedBox(width: 5.0)),
                     ),
                   ),
                 ],

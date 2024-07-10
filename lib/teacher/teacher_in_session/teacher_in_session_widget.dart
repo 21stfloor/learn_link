@@ -1,4 +1,3 @@
-import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/chat_groupwbubbles/chat_details_overlay/chat_details_overlay_widget.dart';
 import '/chat_groupwbubbles/chat_thread_component/chat_thread_component_widget.dart';
@@ -8,10 +7,8 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/teacher/teacher_sidebar/teacher_sidebar_widget.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:webviewx_plus/webviewx_plus.dart';
@@ -21,10 +18,10 @@ export 'teacher_in_session_model.dart';
 class TeacherInSessionWidget extends StatefulWidget {
   const TeacherInSessionWidget({
     super.key,
-    this.chatRef,
+    required this.chatDoc,
   });
 
-  final DocumentReference? chatRef;
+  final ChatsRecord? chatDoc;
 
   @override
   State<TeacherInSessionWidget> createState() => _TeacherInSessionWidgetState();
@@ -32,7 +29,6 @@ class TeacherInSessionWidget extends StatefulWidget {
 
 class _TeacherInSessionWidgetState extends State<TeacherInSessionWidget> {
   late TeacherInSessionModel _model;
-  var _isReady = false;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -40,23 +36,6 @@ class _TeacherInSessionWidgetState extends State<TeacherInSessionWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => TeacherInSessionModel());
-
-    // On page load action.
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
-        _model.chatDoc = await ChatsRecord.getDocumentOnce(widget.chatRef!);
-        setState(() {
-          _isReady = true;
-        });
-        if (!_model.chatDoc!.users.contains(currentUserReference)) {
-          await widget.chatRef!.update({
-            ...mapToFirestore(
-              {
-                'users': FieldValue.arrayUnion([currentUserReference]),
-              },
-            ),
-          });
-        }
-    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
   }
@@ -106,7 +85,7 @@ class _TeacherInSessionWidgetState extends State<TeacherInSessionWidget> {
                 model: _model.chatThreadComponentModel,
                 updateCallback: () => setState(() {}),
                 child: ChatThreadComponentWidget(
-                  chatRef: _model.chatDoc,
+                  chatRef: widget!.chatDoc,
                 ),
               ),
             ),
@@ -128,7 +107,7 @@ class _TeacherInSessionWidgetState extends State<TeacherInSessionWidget> {
                   updateCallback: () => setState(() {}),
                   child: DrawerToggleWidget(),
                 ),
-              _isReady?Expanded(
+              Expanded(
                 flex: 10,
                 child: Align(
                   alignment: AlignmentDirectional(0.0, 0.0),
@@ -200,7 +179,7 @@ class _TeacherInSessionWidgetState extends State<TeacherInSessionWidget> {
                                                           context),
                                                   child:
                                                       ChatDetailsOverlayWidget(
-                                                    chatRef: _model.chatDoc!,
+                                                    chatRef: widget!.chatDoc!,
                                                   ),
                                                 ),
                                               ),
@@ -334,7 +313,7 @@ class _TeacherInSessionWidgetState extends State<TeacherInSessionWidget> {
                                         flex: 9,
                                         child: StreamBuilder<SessionsRecord>(
                                           stream: SessionsRecord.getDocument(
-                                              _model.chatDoc!.chatSession!),
+                                              widget!.chatDoc!.chatSession!),
                                           builder: (context, snapshot) {
                                             // Customize what your widget looks like when it's loading.
                                             if (!snapshot.hasData) {
@@ -368,7 +347,7 @@ class _TeacherInSessionWidgetState extends State<TeacherInSessionWidget> {
                                                         setState(() {}),
                                                     child:
                                                         VideoCallWidgetWidget(
-                                                      chatRef: _model.chatDoc!,
+                                                      chatRef: widget!.chatDoc!,
                                                     ),
                                                   );
                                                 } else {
@@ -477,8 +456,8 @@ class _TeacherInSessionWidgetState extends State<TeacherInSessionWidget> {
                                                                   context),
                                                           child:
                                                               ChatDetailsOverlayWidget(
-                                                            chatRef:
-                                                                _model.chatDoc!,
+                                                            chatRef: widget!
+                                                                  .chatDoc!,
                                                           ),
                                                         ),
                                                       ),
@@ -589,7 +568,7 @@ class _TeacherInSessionWidgetState extends State<TeacherInSessionWidget> {
                     ),
                   ),
                 ),
-              ):Container(),
+              ),
             ],
           ),
         ),

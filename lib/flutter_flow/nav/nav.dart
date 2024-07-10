@@ -294,12 +294,13 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'teacherInSession',
           path: '/teacherInSession',
           requireAuth: true,
+          asyncParams: {
+            'chatDoc': getDoc(['chats'], ChatsRecord.fromSnapshot),
+          },
           builder: (context, params) => TeacherInSessionWidget(
-            chatRef: params.getParam(
-              'chatRef',
-              ParamType.DocumentReference,
-              isList: false,
-              collectionNamePath: ['chats'],
+            chatDoc: params.getParam(
+              'chatDoc',
+              ParamType.Document,
             ),
           ),
         )

@@ -197,7 +197,7 @@ class _TeacherMySessionsPageWidgetState
                                                         AlignmentDirectional(
                                                             0.0, 0.0),
                                                     child: Container(
-                                                      width: 1024.0,
+                                                      width: 1280.0,
                                                       height: MediaQuery.sizeOf(
                                                                   context)
                                                               .height *
@@ -892,6 +892,7 @@ class _TeacherMySessionsPageWidgetState
                                                                                                             teacher: currentUserReference,
                                                                                                             daysRemaining: containerSchedulesRecord.totalDays,
                                                                                                             schedule: listViewSessionRequestsRecord.schedule,
+                                                                                                            videoCallStatus: false,
                                                                                                           ),
                                                                                                           ...mapToFirestore(
                                                                                                             {
