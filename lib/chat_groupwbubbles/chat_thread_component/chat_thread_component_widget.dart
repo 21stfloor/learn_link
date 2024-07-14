@@ -21,7 +21,7 @@ export 'chat_thread_component_model.dart';
 class ChatThreadComponentWidget extends StatefulWidget {
   const ChatThreadComponentWidget({
     super.key,
-    this.chatRef,
+    required this.chatRef,
   });
 
   final ChatsRecord? chatRef;
@@ -76,7 +76,7 @@ class _ChatThreadComponentWidgetState extends State<ChatThreadComponentWidget> {
                 queryBuilder: (chatMessagesRecord) => chatMessagesRecord
                     .where(
                       'chat',
-                      isEqualTo: widget.chatRef?.reference,
+                      isEqualTo: widget!.chatRef?.reference,
                     )
                     .orderBy('timestamp', descending: true),
                 limit: 200,
@@ -88,9 +88,9 @@ class _ChatThreadComponentWidgetState extends State<ChatThreadComponentWidget> {
                           .equals(listViewChatMessagesRecordList,
                               _model.listViewPreviousSnapshot)) {
                     () async {
-                      if (!widget.chatRef!.lastMessageSeenBy
+                      if (!widget!.chatRef!.lastMessageSeenBy
                           .contains(currentUserReference)) {
-                        await widget.chatRef!.reference.update({
+                        await widget!.chatRef!.reference.update({
                           ...mapToFirestore(
                             {
                               'last_message_seen_by':
@@ -125,6 +125,7 @@ class _ChatThreadComponentWidgetState extends State<ChatThreadComponentWidget> {
                 }
                 List<ChatMessagesRecord> listViewChatMessagesRecordList =
                     snapshot.data!;
+
                 if (listViewChatMessagesRecordList.isEmpty) {
                   return EmptyStateSimpleWidget(
                     icon: Icon(
@@ -386,7 +387,7 @@ class _ChatThreadComponentWidgetState extends State<ChatThreadComponentWidget> {
                                       await chatMessagesRecordReference
                                           .set(createChatMessagesRecordData(
                                         user: currentUserReference,
-                                        chat: widget.chatRef?.reference,
+                                        chat: widget!.chatRef?.reference,
                                         text: _model.textController.text,
                                         timestamp: getCurrentTimestamp,
                                         image: _model.uploadedFileUrl,
@@ -395,7 +396,8 @@ class _ChatThreadComponentWidgetState extends State<ChatThreadComponentWidget> {
                                           .getDocumentFromData(
                                               createChatMessagesRecordData(
                                                 user: currentUserReference,
-                                                chat: widget.chatRef?.reference,
+                                                chat:
+                                                    widget!.chatRef?.reference,
                                                 text:
                                                     _model.textController.text,
                                                 timestamp: getCurrentTimestamp,
@@ -412,7 +414,7 @@ class _ChatThreadComponentWidgetState extends State<ChatThreadComponentWidget> {
                                           currentUserReference!);
                                       // updateChatDocument
 
-                                      await widget.chatRef!.reference.update({
+                                      await widget!.chatRef!.reference.update({
                                         ...createChatsRecordData(
                                           lastMessageTime: getCurrentTimestamp,
                                           lastMessageSentBy:
@@ -565,7 +567,7 @@ class _ChatThreadComponentWidgetState extends State<ChatThreadComponentWidget> {
                                             chatMessagesRecordReference,
                                             createChatMessagesRecordData(
                                               user: currentUserReference,
-                                              chat: widget.chatRef?.reference,
+                                              chat: widget!.chatRef?.reference,
                                               text: _model.textController.text,
                                               timestamp: getCurrentTimestamp,
                                               image: _model.uploadedFileUrl,
@@ -574,8 +576,8 @@ class _ChatThreadComponentWidgetState extends State<ChatThreadComponentWidget> {
                                             .getDocumentFromData(
                                                 createChatMessagesRecordData(
                                                   user: currentUserReference,
-                                                  chat:
-                                                      widget.chatRef?.reference,
+                                                  chat: widget!
+                                                      .chatRef?.reference,
                                                   text: _model
                                                       .textController.text,
                                                   timestamp:
@@ -593,8 +595,8 @@ class _ChatThreadComponentWidgetState extends State<ChatThreadComponentWidget> {
                                             currentUserReference!);
                                         // updateChatDocument
 
-                                        firestoreBatch
-                                            .update(widget.chatRef!.reference, {
+                                        firestoreBatch.update(
+                                            widget!.chatRef!.reference, {
                                           ...createChatsRecordData(
                                             lastMessageTime:
                                                 getCurrentTimestamp,

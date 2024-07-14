@@ -1,15 +1,20 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_drop_down.dart';
+import '/flutter_flow/flutter_flow_expanded_image_view.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/form_field_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'teacher_profile_preview_model.dart';
 export 'teacher_profile_preview_model.dart';
@@ -42,6 +47,21 @@ class _TeacherProfilePreviewWidgetState
     super.initState();
     _model = createModel(context, () => TeacherProfilePreviewModel());
 
+    // On component load action.
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      _model.allRatings = await queryTeacherRatingsRecordOnce(
+        queryBuilder: (teacherRatingsRecord) => teacherRatingsRecord.where(
+          'teacher',
+          isEqualTo: currentUserReference,
+        ),
+      );
+      _model.ratings = _model.allRatings!
+          .unique((e) => e.user!)
+          .toList()
+          .cast<TeacherRatingsRecord>();
+      setState(() {});
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
   }
 
@@ -56,7 +76,7 @@ class _TeacherProfilePreviewWidgetState
   Widget build(BuildContext context) {
     return StreamBuilder<List<TeacherProfileRecord>>(
       stream: queryTeacherProfileRecord(
-        parent: widget.teacherUser?.reference,
+        parent: widget!.teacherUser?.reference,
         singleRecord: true,
       ),
       builder: (context, snapshot) {
@@ -76,11 +96,24 @@ class _TeacherProfilePreviewWidgetState
         }
         List<TeacherProfileRecord> containerTeacherProfileRecordList =
             snapshot.data!;
+
         final containerTeacherProfileRecord =
             containerTeacherProfileRecordList.isNotEmpty
                 ? containerTeacherProfileRecordList.first
                 : null;
         return Container(
+          width: () {
+            if (MediaQuery.sizeOf(context).width < kBreakpointSmall) {
+              return 360.0;
+            } else if (MediaQuery.sizeOf(context).width < kBreakpointMedium) {
+              return 960.0;
+            } else if (MediaQuery.sizeOf(context).width < kBreakpointLarge) {
+              return 1280.0;
+            } else {
+              return 960.0;
+            }
+          }(),
+          height: 600.0,
           decoration: BoxDecoration(
             color: FlutterFlowTheme.of(context).primaryBackground,
           ),
@@ -121,12 +154,12 @@ class _TeacherProfilePreviewWidgetState
                     borderRadius: BorderRadius.circular(8.0),
                     child: Image.network(
                       valueOrDefault<String>(
-                        widget.teacherUser?.photoUrl,
+                        widget!.teacherUser?.photoUrl,
                         'https://firebasestorage.googleapis.com/v0/b/learn-link-el7ijg.appspot.com/o/profile-user_64572.png?alt=media&token=89e05ad0-a7f8-48ce-8ba9-02cbd71f13d1',
                       ),
                       width: double.infinity,
                       height: 330.0,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ),
@@ -143,22 +176,23 @@ class _TeacherProfilePreviewWidgetState
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
                         children: [
-                          Text(
-                            containerTeacherProfileRecord != null
-                                ? (containerTeacherProfileRecord!.subjects
-                                    .toList()
-                                    .toString())
-                                : '-',
-                            style: FlutterFlowTheme.of(context)
-                                .labelMedium
-                                .override(
-                                  fontFamily: 'Readex Pro',
-                                  letterSpacing: 0.0,
-                                ),
-                          ),
+                          if (false)
+                            Text(
+                              containerTeacherProfileRecord != null
+                                  ? (containerTeacherProfileRecord!.subjects
+                                      .toList()
+                                      .toString())
+                                  : '-',
+                              style: FlutterFlowTheme.of(context)
+                                  .labelMedium
+                                  .override(
+                                    fontFamily: 'Readex Pro',
+                                    letterSpacing: 0.0,
+                                  ),
+                            ),
                           Text(
                             valueOrDefault<String>(
-                              widget.teacherUser?.displayName,
+                              widget!.teacherUser?.displayName,
                               '-',
                             ),
                             style: FlutterFlowTheme.of(context)
@@ -173,7 +207,7 @@ class _TeacherProfilePreviewWidgetState
                           ),
                           Text(
                             valueOrDefault<String>(
-                              widget.teacherUser?.email,
+                              widget!.teacherUser?.email,
                               '-',
                             ),
                             style: FlutterFlowTheme.of(context)
@@ -184,63 +218,76 @@ class _TeacherProfilePreviewWidgetState
                                   letterSpacing: 0.0,
                                 ),
                           ),
-                          Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(
-                                0.0, 12.0, 0.0, 0.0),
-                            child: StreamBuilder<List<TeacherRatingsRecord>>(
-                              stream: queryTeacherRatingsRecord(
-                                queryBuilder: (teacherRatingsRecord) =>
-                                    teacherRatingsRecord.where(
-                                  'teacher',
-                                  isEqualTo: widget.teacherUser?.reference,
+                          if (responsiveVisibility(
+                            context: context,
+                            phone: false,
+                            tablet: false,
+                            tabletLandscape: false,
+                            desktop: false,
+                          ))
+                            Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  0.0, 12.0, 0.0, 0.0),
+                              child: StreamBuilder<List<TeacherRatingsRecord>>(
+                                stream: queryTeacherRatingsRecord(
+                                  queryBuilder: (teacherRatingsRecord) =>
+                                      teacherRatingsRecord.where(
+                                    'teacher',
+                                    isEqualTo: widget!.teacherUser?.reference,
+                                  ),
+                                  singleRecord: true,
                                 ),
-                                singleRecord: true,
-                              ),
-                              builder: (context, snapshot) {
-                                // Customize what your widget looks like when it's loading.
-                                if (!snapshot.hasData) {
-                                  return Center(
-                                    child: SizedBox(
-                                      width: 50.0,
-                                      height: 50.0,
-                                      child: CircularProgressIndicator(
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                          FlutterFlowTheme.of(context).primary,
+                                builder: (context, snapshot) {
+                                  // Customize what your widget looks like when it's loading.
+                                  if (!snapshot.hasData) {
+                                    return Center(
+                                      child: SizedBox(
+                                        width: 50.0,
+                                        height: 50.0,
+                                        child: CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                            FlutterFlowTheme.of(context)
+                                                .primary,
+                                          ),
                                         ),
                                       ),
+                                    );
+                                  }
+                                  List<TeacherRatingsRecord>
+                                      ratingBarTeacherRatingsRecordList =
+                                      snapshot.data!;
+
+                                  final ratingBarTeacherRatingsRecord =
+                                      ratingBarTeacherRatingsRecordList
+                                              .isNotEmpty
+                                          ? ratingBarTeacherRatingsRecordList
+                                              .first
+                                          : null;
+                                  return RatingBarIndicator(
+                                    itemBuilder: (context, index) => Icon(
+                                      Icons.star_rounded,
+                                      color:
+                                          FlutterFlowTheme.of(context).warning,
                                     ),
+                                    direction: Axis.horizontal,
+                                    rating:
+                                        ratingBarTeacherRatingsRecord != null
+                                            ? valueOrDefault<double>(
+                                                ratingBarTeacherRatingsRecord
+                                                    ?.rating
+                                                    ?.toDouble(),
+                                                0.0,
+                                              )
+                                            : 0.0,
+                                    unratedColor:
+                                        FlutterFlowTheme.of(context).alternate,
+                                    itemCount: 5,
+                                    itemSize: 24.0,
                                   );
-                                }
-                                List<TeacherRatingsRecord>
-                                    ratingBarTeacherRatingsRecordList =
-                                    snapshot.data!;
-                                final ratingBarTeacherRatingsRecord =
-                                    ratingBarTeacherRatingsRecordList.isNotEmpty
-                                        ? ratingBarTeacherRatingsRecordList
-                                            .first
-                                        : null;
-                                return RatingBarIndicator(
-                                  itemBuilder: (context, index) => Icon(
-                                    Icons.star_rounded,
-                                    color: FlutterFlowTheme.of(context).warning,
-                                  ),
-                                  direction: Axis.horizontal,
-                                  rating: ratingBarTeacherRatingsRecord != null
-                                      ? valueOrDefault<double>(
-                                          ratingBarTeacherRatingsRecord?.rating
-                                              ?.toDouble(),
-                                          0.0,
-                                        )
-                                      : 0.0,
-                                  unratedColor:
-                                      FlutterFlowTheme.of(context).alternate,
-                                  itemCount: 5,
-                                  itemSize: 24.0,
-                                );
-                              },
+                                },
+                              ),
                             ),
-                          ),
                           Align(
                             alignment: AlignmentDirectional(-1.0, 0.0),
                             child: Text(
@@ -289,7 +336,7 @@ class _TeacherProfilePreviewWidgetState
                                             _model.dropDownValueController ??=
                                                 FormFieldController<String>(
                                           _model.dropDownValue ??=
-                                              widget.teacherUser!.active
+                                              widget!.teacherUser!.active
                                                   ? 'Active'
                                                   : 'Inactive',
                                         ),
@@ -329,63 +376,526 @@ class _TeacherProfilePreviewWidgetState
                                     ),
                                   ],
                                 ),
-                                Align(
-                                  alignment: AlignmentDirectional(1.0, -1.0),
-                                  child: FFButtonWidget(
-                                    onPressed: () async {
-                                      await widget.teacherUser!.reference
-                                          .update(createUsersRecordData(
-                                        active:
-                                            _model.dropDownValue == 'Active',
-                                      ));
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Teacher was updated successfully',
-                                            style: TextStyle(
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primaryText,
+                                StreamBuilder<List<CertificatesRecord>>(
+                                  stream: queryCertificatesRecord(
+                                    queryBuilder: (certificatesRecord) =>
+                                        certificatesRecord.where(
+                                      'user',
+                                      isEqualTo: currentUserReference,
+                                    ),
+                                    singleRecord: true,
+                                  ),
+                                  builder: (context, snapshot) {
+                                    // Customize what your widget looks like when it's loading.
+                                    if (!snapshot.hasData) {
+                                      return Center(
+                                        child: SizedBox(
+                                          width: 50.0,
+                                          height: 50.0,
+                                          child: CircularProgressIndicator(
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                              FlutterFlowTheme.of(context)
+                                                  .primary,
                                             ),
                                           ),
-                                          duration:
-                                              Duration(milliseconds: 4000),
-                                          backgroundColor:
-                                              FlutterFlowTheme.of(context)
-                                                  .secondary,
                                         ),
                                       );
-                                      Navigator.pop(context);
-                                    },
-                                    text: 'Update',
-                                    options: FFButtonOptions(
-                                      height: 40.0,
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          24.0, 0.0, 24.0, 0.0),
-                                      iconPadding:
-                                          EdgeInsetsDirectional.fromSTEB(
-                                              0.0, 0.0, 0.0, 0.0),
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
-                                      textStyle: FlutterFlowTheme.of(context)
-                                          .titleSmall
-                                          .override(
-                                            fontFamily: 'Readex Pro',
-                                            color: Colors.white,
-                                            letterSpacing: 0.0,
+                                    }
+                                    List<CertificatesRecord>
+                                        columnCertificatesRecordList =
+                                        snapshot.data!;
+
+                                    // Return an empty Container when the item does not exist.
+                                    if (snapshot.data!.isEmpty) {
+                                      return Container();
+                                    }
+                                    final columnCertificatesRecord =
+                                        columnCertificatesRecordList.isNotEmpty
+                                            ? columnCertificatesRecordList.first
+                                            : null;
+                                    return Column(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        Text(
+                                          'Valid ID',
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .override(
+                                                fontFamily: 'Readex Pro',
+                                                letterSpacing: 0.0,
+                                              ),
+                                        ),
+                                        if (columnCertificatesRecord
+                                                ?.hasValidID() ==
+                                            true)
+                                          InkWell(
+                                            splashColor: Colors.transparent,
+                                            focusColor: Colors.transparent,
+                                            hoverColor: Colors.transparent,
+                                            highlightColor: Colors.transparent,
+                                            onTap: () async {
+                                              await Navigator.push(
+                                                context,
+                                                PageTransition(
+                                                  type: PageTransitionType.fade,
+                                                  child:
+                                                      FlutterFlowExpandedImageView(
+                                                    image: Image.network(
+                                                      valueOrDefault<String>(
+                                                        columnCertificatesRecord
+                                                            ?.validID,
+                                                        'https://firebasestorage.googleapis.com/v0/b/learn-link-el7ijg.appspot.com/o/profile-user_64572.png?alt=media&token=89e05ad0-a7f8-48ce-8ba9-02cbd71f13d1',
+                                                      ),
+                                                      fit: BoxFit.contain,
+                                                    ),
+                                                    allowRotation: false,
+                                                    useHeroAnimation: false,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              child: Image.network(
+                                                valueOrDefault<String>(
+                                                  columnCertificatesRecord
+                                                      ?.validID,
+                                                  'https://firebasestorage.googleapis.com/v0/b/learn-link-el7ijg.appspot.com/o/profile-user_64572.png?alt=media&token=89e05ad0-a7f8-48ce-8ba9-02cbd71f13d1',
+                                                ),
+                                                width: 300.0,
+                                                height: 200.0,
+                                                fit: BoxFit.contain,
+                                              ),
+                                            ),
                                           ),
-                                      elevation: 3.0,
-                                      borderSide: BorderSide(
-                                        color: Colors.transparent,
-                                        width: 1.0,
+                                        Text(
+                                          'Certificates',
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .override(
+                                                fontFamily: 'Readex Pro',
+                                                letterSpacing: 0.0,
+                                              ),
+                                        ),
+                                        Builder(
+                                          builder: (context) {
+                                            final certificateRows =
+                                                columnCertificatesRecord
+                                                        ?.certificates
+                                                        ?.toList() ??
+                                                    [];
+
+                                            return ListView.builder(
+                                              padding: EdgeInsets.zero,
+                                              primary: false,
+                                              shrinkWrap: true,
+                                              scrollDirection: Axis.vertical,
+                                              itemCount: certificateRows.length,
+                                              itemBuilder: (context,
+                                                  certificateRowsIndex) {
+                                                final certificateRowsItem =
+                                                    certificateRows[
+                                                        certificateRowsIndex];
+                                                return InkWell(
+                                                  splashColor:
+                                                      Colors.transparent,
+                                                  focusColor:
+                                                      Colors.transparent,
+                                                  hoverColor:
+                                                      Colors.transparent,
+                                                  highlightColor:
+                                                      Colors.transparent,
+                                                  onTap: () async {
+                                                    await launchURL(
+                                                        certificateRowsItem);
+                                                  },
+                                                  child: ListTile(
+                                                    title: Text(
+                                                      certificateRowsIndex
+                                                          .toString(),
+                                                      style: FlutterFlowTheme
+                                                              .of(context)
+                                                          .titleLarge
+                                                          .override(
+                                                            fontFamily:
+                                                                'Readex Pro',
+                                                            letterSpacing: 0.0,
+                                                          ),
+                                                    ),
+                                                    subtitle: Text(
+                                                      certificateRowsItem,
+                                                      style: FlutterFlowTheme
+                                                              .of(context)
+                                                          .labelMedium
+                                                          .override(
+                                                            fontFamily:
+                                                                'Readex Pro',
+                                                            letterSpacing: 0.0,
+                                                          ),
+                                                    ),
+                                                    trailing: FaIcon(
+                                                      FontAwesomeIcons
+                                                          .externalLinkAlt,
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .secondaryText,
+                                                      size: 20.0,
+                                                    ),
+                                                    tileColor: FlutterFlowTheme
+                                                            .of(context)
+                                                        .secondaryBackground,
+                                                    dense: false,
+                                                  ),
+                                                );
+                                              },
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                                Align(
+                                  alignment: AlignmentDirectional(1.0, -1.0),
+                                  child: Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 12.0, 0.0, 0.0),
+                                    child: FFButtonWidget(
+                                      onPressed: () async {
+                                        await widget!.teacherUser!.reference
+                                            .update(createUsersRecordData(
+                                          active:
+                                              _model.dropDownValue == 'Active',
+                                        ));
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Teacher was updated successfully',
+                                              style: TextStyle(
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primaryText,
+                                              ),
+                                            ),
+                                            duration:
+                                                Duration(milliseconds: 4000),
+                                            backgroundColor:
+                                                FlutterFlowTheme.of(context)
+                                                    .secondary,
+                                          ),
+                                        );
+                                        Navigator.pop(context);
+
+                                        context.goNamed('adminTeacherList');
+                                      },
+                                      text: 'Update',
+                                      options: FFButtonOptions(
+                                        height: 40.0,
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            24.0, 0.0, 24.0, 0.0),
+                                        iconPadding:
+                                            EdgeInsetsDirectional.fromSTEB(
+                                                0.0, 0.0, 0.0, 0.0),
+                                        color: FlutterFlowTheme.of(context)
+                                            .primary,
+                                        textStyle: FlutterFlowTheme.of(context)
+                                            .titleSmall
+                                            .override(
+                                              fontFamily: 'Readex Pro',
+                                              color: Colors.white,
+                                              letterSpacing: 0.0,
+                                            ),
+                                        elevation: 3.0,
+                                        borderSide: BorderSide(
+                                          color: Colors.transparent,
+                                          width: 1.0,
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
                                       ),
-                                      borderRadius: BorderRadius.circular(8.0),
                                     ),
                                   ),
                                 ),
                               ],
                             ),
+                          Builder(
+                            builder: (context) {
+                              final ratingRows = _model.ratings.toList();
+
+                              return ListView.builder(
+                                padding: EdgeInsets.zero,
+                                primary: false,
+                                shrinkWrap: true,
+                                scrollDirection: Axis.vertical,
+                                itemCount: ratingRows.length,
+                                itemBuilder: (context, ratingRowsIndex) {
+                                  final ratingRowsItem =
+                                      ratingRows[ratingRowsIndex];
+                                  return Align(
+                                    alignment: AlignmentDirectional(0.0, 0.0),
+                                    child: Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          16.0, 0.0, 16.0, 12.0),
+                                      child: Container(
+                                        width: double.infinity,
+                                        constraints: BoxConstraints(
+                                          maxWidth: 530.0,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              blurRadius: 3.0,
+                                              color: Color(0x33000000),
+                                              offset: Offset(
+                                                0.0,
+                                                1.0,
+                                              ),
+                                            )
+                                          ],
+                                          borderRadius:
+                                              BorderRadius.circular(12.0),
+                                          border: Border.all(
+                                            color: Color(0xFFF5FBFB),
+                                            width: 1.0,
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0.0, 0.0, 0.0, 12.0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.max,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(
+                                                        16.0, 16.0, 16.0, 12.0),
+                                                child:
+                                                    StreamBuilder<UsersRecord>(
+                                                  stream:
+                                                      UsersRecord.getDocument(
+                                                          ratingRowsItem.user!),
+                                                  builder: (context, snapshot) {
+                                                    // Customize what your widget looks like when it's loading.
+                                                    if (!snapshot.hasData) {
+                                                      return Center(
+                                                        child: SizedBox(
+                                                          width: 50.0,
+                                                          height: 50.0,
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                            valueColor:
+                                                                AlwaysStoppedAnimation<
+                                                                    Color>(
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .primary,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }
+
+                                                    final rowUsersRecord =
+                                                        snapshot.data!;
+
+                                                    return Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.max,
+                                                      children: [
+                                                        Container(
+                                                          width: 60.0,
+                                                          height: 60.0,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Color(
+                                                                0xFFF5FBFB),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8.0),
+                                                            shape: BoxShape
+                                                                .rectangle,
+                                                          ),
+                                                          alignment:
+                                                              AlignmentDirectional(
+                                                                  0.0, 0.0),
+                                                          child: Padding(
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                    2.0),
+                                                            child: ClipRRect(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          6.0),
+                                                              child:
+                                                                  Image.network(
+                                                                valueOrDefault<
+                                                                    String>(
+                                                                  rowUsersRecord
+                                                                      .photoUrl,
+                                                                  'https://firebasestorage.googleapis.com/v0/b/learn-link-el7ijg.appspot.com/o/profile-user_64572.png?alt=media&token=89e05ad0-a7f8-48ce-8ba9-02cbd71f13d1',
+                                                                ),
+                                                                width: 100.0,
+                                                                height: 100.0,
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Expanded(
+                                                          child: Padding(
+                                                            padding:
+                                                                EdgeInsetsDirectional
+                                                                    .fromSTEB(
+                                                                        12.0,
+                                                                        0.0,
+                                                                        0.0,
+                                                                        0.0),
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .max,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  rowUsersRecord
+                                                                      .displayName,
+                                                                  style: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyLarge
+                                                                      .override(
+                                                                        fontFamily:
+                                                                            'Inter',
+                                                                        color: Color(
+                                                                            0xFF101518),
+                                                                        fontSize:
+                                                                            16.0,
+                                                                        letterSpacing:
+                                                                            0.0,
+                                                                        fontWeight:
+                                                                            FontWeight.normal,
+                                                                      ),
+                                                                ),
+                                                                Padding(
+                                                                  padding: EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          0.0,
+                                                                          4.0,
+                                                                          0.0,
+                                                                          0.0),
+                                                                  child: Text(
+                                                                    rowUsersRecord
+                                                                        .email,
+                                                                    style: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .labelSmall
+                                                                        .override(
+                                                                          fontFamily:
+                                                                              'Inter',
+                                                                          color:
+                                                                              Color(0xFF57636C),
+                                                                          fontSize:
+                                                                              12.0,
+                                                                          letterSpacing:
+                                                                              0.0,
+                                                                          fontWeight:
+                                                                              FontWeight.normal,
+                                                                        ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(
+                                                        16.0, 12.0, 16.0, 16.0),
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          EdgeInsetsDirectional
+                                                              .fromSTEB(
+                                                                  0.0,
+                                                                  12.0,
+                                                                  0.0,
+                                                                  0.0),
+                                                      child: Text(
+                                                        ratingRowsItem.note,
+                                                        style: FlutterFlowTheme
+                                                                .of(context)
+                                                            .labelMedium
+                                                            .override(
+                                                              fontFamily:
+                                                                  'Inter',
+                                                              color: Color(
+                                                                  0xFF57636C),
+                                                              fontSize: 14.0,
+                                                              letterSpacing:
+                                                                  0.0,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal,
+                                                            ),
+                                                      ),
+                                                    ),
+                                                    RatingBarIndicator(
+                                                      itemBuilder:
+                                                          (context, index) =>
+                                                              Icon(
+                                                        Icons.star_rounded,
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .tertiary,
+                                                      ),
+                                                      direction:
+                                                          Axis.horizontal,
+                                                      rating: ratingRowsItem
+                                                          .rating
+                                                          .toDouble(),
+                                                      unratedColor:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .accent3,
+                                                      itemCount: 5,
+                                                      itemSize: 20.0,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
                         ],
                       ),
                     ),

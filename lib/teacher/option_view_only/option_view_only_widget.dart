@@ -34,7 +34,7 @@ class _OptionViewOnlyWidgetState extends State<OptionViewOnlyWidget> {
     super.initState();
     _model = createModel(context, () => OptionViewOnlyModel());
 
-    _model.textController ??= TextEditingController(text: widget.parameter1);
+    _model.textController ??= TextEditingController(text: widget!.parameter1);
     _model.textFieldFocusNode ??= FocusNode();
 
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
@@ -56,7 +56,7 @@ class _OptionViewOnlyWidgetState extends State<OptionViewOnlyWidget> {
       readOnly: true,
       obscureText: false,
       decoration: InputDecoration(
-        labelText: 'Option ${widget.parameter2?.toString()}',
+        labelText: 'Option ${widget!.parameter2?.toString()}',
         hintStyle: FlutterFlowTheme.of(context).bodyLarge.override(
               fontFamily: 'Readex Pro',
               letterSpacing: 0.0,

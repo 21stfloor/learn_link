@@ -74,14 +74,14 @@ service cloud.firestore {
     match /subscriptions/{document} {
       allow create: if true;
       allow read: if true;
-      allow write: if false;
+      allow write: if request.auth != null;
       allow delete: if false;
     }
 
     match /payments/{document} {
       allow create: if true;
       allow read: if true;
-      allow write: if false;
+      allow write: if request.auth != null;
       allow delete: if false;
     }
 
@@ -102,8 +102,8 @@ service cloud.firestore {
     match /quiz/{document} {
       allow create: if request.auth != null;
       allow read: if request.auth != null;
-      allow write: if resource.data.createdBy == /databases/$(database)/documents/users/$(request.auth.uid);
-      allow delete: if resource.data.createdBy == /databases/$(database)/documents/users/$(request.auth.uid);
+      allow write: if request.auth != null;
+      allow delete: if request.auth != null;
     }
 
     match /quiz/{parent}/question/{document} {
@@ -121,22 +121,103 @@ service cloud.firestore {
     match /teacherRating/{document} {
       allow create: if request.auth != null;
       allow read: if request.auth != null;
-      allow write: if false;
+      allow write: if request.auth != null;
       allow delete: if false;
     }
 
     match /chat_messages/{document} {
       allow create: if request.auth != null;
       allow read: if request.auth != null;
-      allow write: if false;
+      allow write: if request.auth != null;
       allow delete: if false;
     }
 
     match /chats/{document} {
       allow create: if request.auth != null;
       allow read: if request.auth != null;
-      allow write: if false;
+      allow write: if request.auth != null;
       allow delete: if false;
     }
+
+    match /attendance/{document} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+
+    match /quiz/{parent}/quizResult/{document} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+
+    match /{path=**}/quizResult/{document} {
+      allow read: if request.auth != null;
+    }
+
+
+    match /QuizSession/{document} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+      allow delete: if false;
+    }
+
+    match /QuizSession/{parent}/QuizTaker/{document} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+
+    match /{path=**}/QuizTaker/{document} {
+      allow read: if request.auth != null;
+    }
+
+
+    match /prices/{document} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+
+    match /schedules/{parent}/milestone/{document} {
+      allow create: if true;
+      allow read: if true;
+      allow write: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+
+    match /{path=**}/milestone/{document} {
+      allow read: if true;
+    }
+
+
+    match /sessions/{parent}/sessionMilestone/{document} {
+      allow create: if true;
+      allow read: if true;
+      allow write: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+
+    match /{path=**}/sessionMilestone/{document} {
+      allow read: if true;
+    }
+
+
+    match /payments/{parent}/Refund/{document} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+      allow delete: if false;
+    }
+
+    match /{path=**}/Refund/{document} {
+      allow read: if request.auth != null;
+    }
+
   }
 }

@@ -55,11 +55,11 @@ class _EmptyStateSimpleWidgetState extends State<EmptyStateSimpleWidget> {
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          widget.icon!,
+          widget!.icon!,
           Padding(
             padding: EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
             child: Text(
-              widget.title,
+              widget!.title,
               textAlign: TextAlign.center,
               style: FlutterFlowTheme.of(context).headlineSmall.override(
                     fontFamily: 'Inter',
@@ -71,7 +71,7 @@ class _EmptyStateSimpleWidgetState extends State<EmptyStateSimpleWidget> {
           Padding(
             padding: EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 16.0, 0.0),
             child: Text(
-              widget.body,
+              widget!.body,
               textAlign: TextAlign.center,
               style: FlutterFlowTheme.of(context).labelMedium.override(
                     fontFamily: 'Readex Pro',

@@ -132,6 +132,7 @@ class _Chat2MainWidgetState extends State<Chat2MainWidget> {
                       );
                     }
                     List<ChatsRecord> listViewChatsRecordList = snapshot.data!;
+
                     if (listViewChatsRecordList.isEmpty) {
                       return Center(
                         child: Container(
@@ -241,8 +242,10 @@ class _Chat2MainWidgetState extends State<Chat2MainWidget> {
                                                 ),
                                               );
                                             }
+
                                             final rowUsersRecord =
                                                 snapshot.data!;
+
                                             return Row(
                                               mainAxisSize: MainAxisSize.max,
                                               crossAxisAlignment:
@@ -494,8 +497,10 @@ class _Chat2MainWidgetState extends State<Chat2MainWidget> {
                                                 ),
                                               );
                                             }
+
                                             final rowUsersRecord =
                                                 snapshot.data!;
+
                                             return Row(
                                               mainAxisSize: MainAxisSize.max,
                                               crossAxisAlignment:
@@ -548,9 +553,11 @@ class _Chat2MainWidgetState extends State<Chat2MainWidget> {
                                                                   ),
                                                                 );
                                                               }
+
                                                               final containerUsersRecord =
                                                                   snapshot
                                                                       .data!;
+
                                                               return Container(
                                                                 width: 32.0,
                                                                 height: 32.0,

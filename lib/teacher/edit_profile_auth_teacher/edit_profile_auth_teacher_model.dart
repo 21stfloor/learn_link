@@ -11,11 +11,13 @@ import 'edit_profile_auth_teacher_widget.dart'
     show EditProfileAuthTeacherWidget;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 
 class EditProfileAuthTeacherModel
     extends FlutterFlowModel<EditProfileAuthTeacherWidget> {
@@ -23,31 +25,23 @@ class EditProfileAuthTeacherModel
 
   DateTime? selectedBirthday;
 
+  String? selectedPhoto;
+
   ///  State fields for stateful widgets in this component.
 
   final formKey = GlobalKey<FormState>();
+  // Stores action output result for [Firestore Query - Query a collection] action in editProfile_auth_teacher widget.
+  TeacherProfileRecord? existingTeacherProfile;
   bool isDataUploading = false;
   FFUploadedFile uploadedLocalFile =
       FFUploadedFile(bytes: Uint8List.fromList([]));
   String uploadedFileUrl = '';
 
-  // State field(s) for firstName widget.
-  FocusNode? firstNameFocusNode;
-  TextEditingController? firstNameTextController;
-  String? Function(BuildContext, String?)? firstNameTextControllerValidator;
-  String? _firstNameTextControllerValidator(BuildContext context, String? val) {
-    if (val == null || val.isEmpty) {
-      return 'Field is required';
-    }
-
-    return null;
-  }
-
-  // State field(s) for lastName widget.
-  FocusNode? lastNameFocusNode;
-  TextEditingController? lastNameTextController;
-  String? Function(BuildContext, String?)? lastNameTextControllerValidator;
-  String? _lastNameTextControllerValidator(BuildContext context, String? val) {
+  // State field(s) for fullName widget.
+  FocusNode? fullNameFocusNode;
+  TextEditingController? fullNameTextController;
+  String? Function(BuildContext, String?)? fullNameTextControllerValidator;
+  String? _fullNameTextControllerValidator(BuildContext context, String? val) {
     if (val == null || val.isEmpty) {
       return 'Field is required';
     }
@@ -74,18 +68,14 @@ class EditProfileAuthTeacherModel
 
   @override
   void initState(BuildContext context) {
-    firstNameTextControllerValidator = _firstNameTextControllerValidator;
-    lastNameTextControllerValidator = _lastNameTextControllerValidator;
+    fullNameTextControllerValidator = _fullNameTextControllerValidator;
     bioTextControllerValidator = _bioTextControllerValidator;
   }
 
   @override
   void dispose() {
-    firstNameFocusNode?.dispose();
-    firstNameTextController?.dispose();
-
-    lastNameFocusNode?.dispose();
-    lastNameTextController?.dispose();
+    fullNameFocusNode?.dispose();
+    fullNameTextController?.dispose();
 
     bioFocusNode?.dispose();
     bioTextController?.dispose();

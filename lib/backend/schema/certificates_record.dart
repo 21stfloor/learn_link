@@ -26,9 +26,15 @@ class CertificatesRecord extends FirestoreRecord {
   List<String> get certificates => _certificates ?? const [];
   bool hasCertificates() => _certificates != null;
 
+  // "validID" field.
+  String? _validID;
+  String get validID => _validID ?? '';
+  bool hasValidID() => _validID != null;
+
   void _initializeFields() {
     _user = snapshotData['user'] as DocumentReference?;
     _certificates = getDataList(snapshotData['certificates']);
+    _validID = snapshotData['validID'] as String?;
   }
 
   static CollectionReference get collection =>
@@ -67,10 +73,12 @@ class CertificatesRecord extends FirestoreRecord {
 
 Map<String, dynamic> createCertificatesRecordData({
   DocumentReference? user,
+  String? validID,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
       'user': user,
+      'validID': validID,
     }.withoutNulls,
   );
 
@@ -85,12 +93,13 @@ class CertificatesRecordDocumentEquality
   bool equals(CertificatesRecord? e1, CertificatesRecord? e2) {
     const listEquality = ListEquality();
     return e1?.user == e2?.user &&
-        listEquality.equals(e1?.certificates, e2?.certificates);
+        listEquality.equals(e1?.certificates, e2?.certificates) &&
+        e1?.validID == e2?.validID;
   }
 
   @override
   int hash(CertificatesRecord? e) =>
-      const ListEquality().hash([e?.user, e?.certificates]);
+      const ListEquality().hash([e?.user, e?.certificates, e?.validID]);
 
   @override
   bool isValidKey(Object? o) => o is CertificatesRecord;

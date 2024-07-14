@@ -16,9 +16,9 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart'
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 import 'quiz_edit_form_model.dart';
 export 'quiz_edit_form_model.dart';
 
@@ -44,8 +44,32 @@ class _QuizEditFormWidgetState extends State<QuizEditFormWidget> {
     super.initState();
     _model = createModel(context, () => QuizEditFormModel());
 
+    // On page load action.
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      _model.allQuestions = await queryQuestionRecordOnce(
+        parent: widget!.quizToEdit?.reference,
+      );
+      _model.iterator = 0;
+      setState(() {});
+      while (_model.iterator < _model.allQuestions!.length) {
+        _model.questionIteration = _model.allQuestions?[_model.iterator];
+        _model.addToQuestionsCreated(QuestionStruct(
+          question: _model.questionIteration?.question,
+          options: _model.questionIteration?.options,
+          answer: _model.questionIteration?.answer,
+        ));
+        _model.iterator = _model.iterator + 1;
+        setState(() {});
+      }
+      if (_model.allQuestions!.length > 0) {
+        _model.questionPageText =
+            '${(_model.pageViewCurrentIndex + 1).toString()}/${_model.questionsCreated.length.toString()}';
+        setState(() {});
+      }
+    });
+
     _model.quizTitleTextController ??=
-        TextEditingController(text: widget.quizToEdit?.name);
+        TextEditingController(text: widget!.quizToEdit?.name);
     _model.quizTitleFocusNode ??= FocusNode();
 
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
@@ -69,12 +93,10 @@ class _QuizEditFormWidgetState extends State<QuizEditFormWidget> {
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         drawer: Drawer(
           elevation: 16.0,
-          child: WebViewAware(
-            child: wrapWithModel(
-              model: _model.teacherSidebarModel,
-              updateCallback: () => setState(() {}),
-              child: TeacherSidebarWidget(),
-            ),
+          child: wrapWithModel(
+            model: _model.teacherSidebarModel,
+            updateCallback: () => setState(() {}),
+            child: TeacherSidebarWidget(),
           ),
         ),
         body: SafeArea(
@@ -222,12 +244,13 @@ class _QuizEditFormWidgetState extends State<QuizEditFormWidget> {
                                         List<SubjectsRecord>
                                             subjectSubjectsRecordList =
                                             snapshot.data!;
+
                                         return FlutterFlowDropDown<String>(
                                           controller:
                                               _model.subjectValueController ??=
                                                   FormFieldController<String>(
                                             _model.subjectValue ??=
-                                                widget.quizToEdit?.subject,
+                                                widget!.quizToEdit?.subject,
                                           ),
                                           options: subjectSubjectsRecordList
                                               .map((e) => e.name)
@@ -336,33 +359,29 @@ class _QuizEditFormWidgetState extends State<QuizEditFormWidget> {
                                                                 .resolve(
                                                                     Directionality.of(
                                                                         context)),
-                                                        child: WebViewAware(
-                                                          child:
-                                                              GestureDetector(
-                                                            onTap: () => _model
-                                                                    .unfocusNode
-                                                                    .canRequestFocus
-                                                                ? FocusScope.of(
-                                                                        context)
-                                                                    .requestFocus(
-                                                                        _model
-                                                                            .unfocusNode)
-                                                                : FocusScope.of(
-                                                                        context)
-                                                                    .unfocus(),
-                                                            child: Container(
-                                                              height: 512.0,
-                                                              width: 360.0,
-                                                              child:
-                                                                  QuestionNewFormWidget(
-                                                                saveAction:
-                                                                    (questionData) async {
-                                                                  _model.addToQuestionsCreated(
-                                                                      questionData);
-                                                                  setState(
-                                                                      () {});
-                                                                },
-                                                              ),
+                                                        child: GestureDetector(
+                                                          onTap: () => _model
+                                                                  .unfocusNode
+                                                                  .canRequestFocus
+                                                              ? FocusScope.of(
+                                                                      context)
+                                                                  .requestFocus(
+                                                                      _model
+                                                                          .unfocusNode)
+                                                              : FocusScope.of(
+                                                                      context)
+                                                                  .unfocus(),
+                                                          child: Container(
+                                                            height: 512.0,
+                                                            width: 360.0,
+                                                            child:
+                                                                QuestionNewFormWidget(
+                                                              saveAction:
+                                                                  (questionData) async {
+                                                                _model.addToQuestionsCreated(
+                                                                    questionData);
+                                                                setState(() {});
+                                                              },
                                                             ),
                                                           ),
                                                         ),
@@ -454,33 +473,29 @@ class _QuizEditFormWidgetState extends State<QuizEditFormWidget> {
                                                                 .resolve(
                                                                     Directionality.of(
                                                                         context)),
-                                                        child: WebViewAware(
-                                                          child:
-                                                              GestureDetector(
-                                                            onTap: () => _model
-                                                                    .unfocusNode
-                                                                    .canRequestFocus
-                                                                ? FocusScope.of(
-                                                                        context)
-                                                                    .requestFocus(
-                                                                        _model
-                                                                            .unfocusNode)
-                                                                : FocusScope.of(
-                                                                        context)
-                                                                    .unfocus(),
-                                                            child: Container(
-                                                              height: 512.0,
-                                                              width: 360.0,
-                                                              child:
-                                                                  QuestionNewFormWidget(
-                                                                saveAction:
-                                                                    (questionData) async {
-                                                                  _model.addToQuestionsCreated(
-                                                                      questionData);
-                                                                  setState(
-                                                                      () {});
-                                                                },
-                                                              ),
+                                                        child: GestureDetector(
+                                                          onTap: () => _model
+                                                                  .unfocusNode
+                                                                  .canRequestFocus
+                                                              ? FocusScope.of(
+                                                                      context)
+                                                                  .requestFocus(
+                                                                      _model
+                                                                          .unfocusNode)
+                                                              : FocusScope.of(
+                                                                      context)
+                                                                  .unfocus(),
+                                                          child: Container(
+                                                            height: 512.0,
+                                                            width: 360.0,
+                                                            child:
+                                                                QuestionNewFormWidget(
+                                                              saveAction:
+                                                                  (questionData) async {
+                                                                _model.addToQuestionsCreated(
+                                                                    questionData);
+                                                                setState(() {});
+                                                              },
                                                             ),
                                                           ),
                                                         ),
@@ -507,6 +522,7 @@ class _QuizEditFormWidgetState extends State<QuizEditFormWidget> {
                                             final questionsRows = _model
                                                 .questionsCreated
                                                 .toList();
+
                                             return Container(
                                               width: double.infinity,
                                               height: 500.0,
@@ -559,6 +575,37 @@ class _QuizEditFormWidgetState extends State<QuizEditFormWidget> {
                                                             ),
                                                             question:
                                                                 questionsRowsItem,
+                                                            deleteAction:
+                                                                () async {
+                                                              _model.removeAtIndexFromQuestionsCreated(
+                                                                  questionsRowsIndex);
+                                                              setState(() {});
+                                                              _model.questionPageText =
+                                                                  '${(_model.pageViewCurrentIndex + 1).toString()}/${_model.questionsCreated.length.toString()}';
+                                                              setState(() {});
+                                                              ScaffoldMessenger
+                                                                      .of(context)
+                                                                  .showSnackBar(
+                                                                SnackBar(
+                                                                  content: Text(
+                                                                    'Question was successfully delete',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .primaryText,
+                                                                    ),
+                                                                  ),
+                                                                  duration: Duration(
+                                                                      milliseconds:
+                                                                          4000),
+                                                                  backgroundColor:
+                                                                      FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .secondary,
+                                                                ),
+                                                              );
+                                                            },
                                                           ),
                                                         );
                                                       },
@@ -654,20 +701,17 @@ class _QuizEditFormWidgetState extends State<QuizEditFormWidget> {
                                       await showDialog(
                                         context: context,
                                         builder: (alertDialogContext) {
-                                          return WebViewAware(
-                                            child: AlertDialog(
-                                              title: Text('Invalid'),
-                                              content: Text(
-                                                  'Please select a subject'),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.pop(
-                                                          alertDialogContext),
-                                                  child: Text('Ok'),
-                                                ),
-                                              ],
-                                            ),
+                                          return AlertDialog(
+                                            title: Text('Invalid'),
+                                            content:
+                                                Text('Please select a subject'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(
+                                                    alertDialogContext),
+                                                child: Text('Ok'),
+                                              ),
+                                            ],
                                           );
                                         },
                                       );
@@ -687,26 +731,23 @@ class _QuizEditFormWidgetState extends State<QuizEditFormWidget> {
                                           ),
                                     );
                                     if ((_model.existingQuizCount! > 0) &&
-                                        (widget.quizToEdit?.name !=
+                                        (widget!.quizToEdit?.name !=
                                             _model.quizTitleTextController
                                                 .text)) {
                                       await showDialog(
                                         context: context,
                                         builder: (alertDialogContext) {
-                                          return WebViewAware(
-                                            child: AlertDialog(
-                                              title: Text('Invalid'),
-                                              content: Text(
-                                                  'Quiz with the same name already exists!'),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.pop(
-                                                          alertDialogContext),
-                                                  child: Text('Ok'),
-                                                ),
-                                              ],
-                                            ),
+                                          return AlertDialog(
+                                            title: Text('Invalid'),
+                                            content: Text(
+                                                'Quiz with the same name already exists!'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(
+                                                    alertDialogContext),
+                                                child: Text('Ok'),
+                                              ),
+                                            ],
                                           );
                                         },
                                       );
@@ -715,14 +756,25 @@ class _QuizEditFormWidgetState extends State<QuizEditFormWidget> {
                                       _model.iterator = 0;
                                       setState(() {});
                                       while (_model.iterator <
-                                          widget.quizToEdit!.questions.length) {
-                                        firestoreBatch.delete(widget.quizToEdit!
+                                          widget!
+                                              .quizToEdit!.questions.length) {
+                                        firestoreBatch.delete(widget!
+                                            .quizToEdit!
                                             .questions[_model.iterator]);
                                         _model.iterator = _model.iterator + 1;
                                         setState(() {});
                                       }
                                       _model.iterator = 0;
                                       setState(() {});
+
+                                      firestoreBatch.update(
+                                          widget!.quizToEdit!.reference, {
+                                        ...mapToFirestore(
+                                          {
+                                            'questions': FieldValue.delete(),
+                                          },
+                                        ),
+                                      });
                                       while (_model.iterator <
                                           _model.questionsCreated.length) {
                                         _model.currentQuestion = _model
@@ -731,7 +783,7 @@ class _QuizEditFormWidgetState extends State<QuizEditFormWidget> {
 
                                         var questionRecordReference =
                                             QuestionRecord.createDoc(
-                                                widget.quizToEdit!.reference);
+                                                widget!.quizToEdit!.reference);
                                         firestoreBatch
                                             .set(questionRecordReference, {
                                           ...createQuestionRecordData(
@@ -764,7 +816,7 @@ class _QuizEditFormWidgetState extends State<QuizEditFormWidget> {
                                         }, questionRecordReference);
 
                                         firestoreBatch.update(
-                                            widget.quizToEdit!.reference, {
+                                            widget!.quizToEdit!.reference, {
                                           ...mapToFirestore(
                                             {
                                               'questions':
@@ -780,7 +832,7 @@ class _QuizEditFormWidgetState extends State<QuizEditFormWidget> {
                                       }
 
                                       firestoreBatch.update(
-                                          widget.quizToEdit!.reference, {
+                                          widget!.quizToEdit!.reference, {
                                         ...createQuizRecordData(
                                           name: _model
                                               .quizTitleTextController.text,

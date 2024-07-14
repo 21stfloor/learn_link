@@ -43,7 +43,7 @@ class _Chat2DetailsWidgetState extends State<Chat2DetailsWidget> {
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       unawaited(
         () async {
-          await widget.chatRef!.reference.update({
+          await widget!.chatRef!.reference.update({
             ...mapToFirestore(
               {
                 'last_message_seen_by':
@@ -101,7 +101,7 @@ class _Chat2DetailsWidgetState extends State<Chat2DetailsWidget> {
             },
           ),
           title: FutureBuilder<UsersRecord>(
-            future: UsersRecord.getDocumentOnce(widget.chatRef!.users
+            future: UsersRecord.getDocumentOnce(widget!.chatRef!.users
                 .where((e) => e != currentUserReference)
                 .toList()
                 .first),
@@ -120,10 +120,12 @@ class _Chat2DetailsWidgetState extends State<Chat2DetailsWidget> {
                   ),
                 );
               }
+
               final conditionalBuilderUsersRecord = snapshot.data!;
+
               return Builder(
                 builder: (context) {
-                  if (widget.chatRef!.users.length <= 2) {
+                  if (widget!.chatRef!.users.length <= 2) {
                     return Row(
                       mainAxisSize: MainAxisSize.max,
                       children: [
@@ -220,7 +222,7 @@ class _Chat2DetailsWidgetState extends State<Chat2DetailsWidget> {
                                 Align(
                                   alignment: AlignmentDirectional(1.0, 1.0),
                                   child: FutureBuilder<UsersRecord>(
-                                    future: UsersRecord.getDocumentOnce(widget
+                                    future: UsersRecord.getDocumentOnce(widget!
                                         .chatRef!.users
                                         .where((e) => e != currentUserReference)
                                         .toList()
@@ -242,8 +244,10 @@ class _Chat2DetailsWidgetState extends State<Chat2DetailsWidget> {
                                           ),
                                         );
                                       }
+
                                       final secondUserUsersRecord =
                                           snapshot.data!;
+
                                       return Container(
                                         width: 32.0,
                                         height: 32.0,
@@ -445,7 +449,7 @@ class _Chat2DetailsWidgetState extends State<Chat2DetailsWidget> {
                                     0.0, 4.0, 0.0, 0.0),
                                 child: Text(
                                   '${valueOrDefault<String>(
-                                    widget.chatRef?.users?.length.toString(),
+                                    widget!.chatRef?.users?.length.toString(),
                                     '2',
                                   )} members',
                                   style: FlutterFlowTheme.of(context)
@@ -490,14 +494,14 @@ class _Chat2DetailsWidgetState extends State<Chat2DetailsWidget> {
                     context: context,
                     builder: (context) {
                       return GestureDetector(
-                          onTap: () => _model.unfocusNode.canRequestFocus
-                              ? FocusScope.of(context)
-                                  .requestFocus(_model.unfocusNode)
-                              : FocusScope.of(context).unfocus(),
-                          child: Padding(
-                            padding: MediaQuery.viewInsetsOf(context),
-                            child: ChatDetailsOverlayWidget(
-                              chatRef: widget.chatRef!,
+                        onTap: () => _model.unfocusNode.canRequestFocus
+                            ? FocusScope.of(context)
+                                .requestFocus(_model.unfocusNode)
+                            : FocusScope.of(context).unfocus(),
+                        child: Padding(
+                          padding: MediaQuery.viewInsetsOf(context),
+                          child: ChatDetailsOverlayWidget(
+                            chatDoc: widget!.chatRef!,
                           ),
                         ),
                       );
@@ -517,7 +521,7 @@ class _Chat2DetailsWidgetState extends State<Chat2DetailsWidget> {
             updateCallback: () => setState(() {}),
             updateOnChange: true,
             child: ChatThreadComponentWidget(
-              chatRef: widget.chatRef,
+              chatRef: widget!.chatRef!,
             ),
           ),
         ),

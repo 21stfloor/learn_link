@@ -13,10 +13,12 @@ class QuestionOptionEntryWidget extends StatefulWidget {
     super.key,
     required this.onSubmitAction,
     required this.onDeleteAction,
+    this.defaultText,
   });
 
   final Future Function(String text)? onSubmitAction;
   final Future Function()? onDeleteAction;
+  final String? defaultText;
 
   @override
   State<QuestionOptionEntryWidget> createState() =>
@@ -37,7 +39,10 @@ class _QuestionOptionEntryWidgetState extends State<QuestionOptionEntryWidget> {
     super.initState();
     _model = createModel(context, () => QuestionOptionEntryModel());
 
-    _model.textController ??= TextEditingController();
+    _model.textController ??= TextEditingController(
+        text: widget!.defaultText != null && widget!.defaultText != ''
+            ? widget!.defaultText
+            : '');
     _model.textFieldFocusNode ??= FocusNode();
     _model.textFieldFocusNode!.addListener(
       () async {

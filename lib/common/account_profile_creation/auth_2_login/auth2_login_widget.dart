@@ -10,7 +10,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 import 'auth2_login_model.dart';
 export 'auth2_login_model.dart';
 
@@ -89,6 +88,8 @@ class _Auth2LoginWidgetState extends State<Auth2LoginWidget>
 
   @override
   Widget build(BuildContext context) {
+    context.watch<FFAppState>();
+
     return GestureDetector(
       onTap: () => _model.unfocusNode.canRequestFocus
           ? FocusScope.of(context).requestFocus(_model.unfocusNode)
@@ -223,6 +224,7 @@ class _Auth2LoginWidgetState extends State<Auth2LoginWidget>
                                         focusNode: _model.emailAddressFocusNode,
                                         autofocus: true,
                                         autofillHints: [AutofillHints.email],
+                                        textInputAction: TextInputAction.next,
                                         obscureText: false,
                                         decoration: InputDecoration(
                                           labelText: 'Email',
@@ -307,6 +309,7 @@ class _Auth2LoginWidgetState extends State<Auth2LoginWidget>
                                         focusNode: _model.passwordFocusNode,
                                         autofocus: true,
                                         autofillHints: [AutofillHints.password],
+                                        textInputAction: TextInputAction.done,
                                         obscureText: !_model.passwordVisibility,
                                         decoration: InputDecoration(
                                           labelText: 'Password',
@@ -401,6 +404,7 @@ class _Auth2LoginWidgetState extends State<Auth2LoginWidget>
                                         0.0, 0.0, 0.0, 16.0),
                                     child: FFButtonWidget(
                                       onPressed: () async {
+                                        await authManager.refreshUser();
                                         if (_model.formKey.currentState ==
                                                 null ||
                                             !_model.formKey.currentState!
@@ -420,6 +424,70 @@ class _Auth2LoginWidgetState extends State<Auth2LoginWidget>
                                           return;
                                         }
 
+                                        if (!currentUserEmailVerified &&
+                                            !FFAppConstants.adminEmails
+                                                .contains(currentUserEmail)) {
+                                          if (FFAppState()
+                                                  .failedLoginAttempts >=
+                                              FFAppConstants
+                                                  .maxFailedLoginAttempt) {
+                                            GoRouter.of(context)
+                                                .prepareAuthEvent();
+                                            await authManager.signOut();
+                                            GoRouter.of(context)
+                                                .clearRedirectLocation();
+
+                                            return;
+                                          }
+                                          var confirmDialogResponse =
+                                              await showDialog<bool>(
+                                                    context: context,
+                                                    builder:
+                                                        (alertDialogContext) {
+                                                      return AlertDialog(
+                                                        title: Text(
+                                                            'Re-send email verification'),
+                                                        content: Text(
+                                                            'Your account is not yet verified, would youy like to re-send email verification?'),
+                                                        actions: [
+                                                          TextButton(
+                                                            onPressed: () =>
+                                                                Navigator.pop(
+                                                                    alertDialogContext,
+                                                                    false),
+                                                            child:
+                                                                Text('Cancel'),
+                                                          ),
+                                                          TextButton(
+                                                            onPressed: () =>
+                                                                Navigator.pop(
+                                                                    alertDialogContext,
+                                                                    true),
+                                                            child:
+                                                                Text('Confirm'),
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  ) ??
+                                                  false;
+                                          if (confirmDialogResponse) {
+                                            await authManager
+                                                .sendEmailVerification();
+                                            FFAppState().failedLoginAttempts =
+                                                FFAppState()
+                                                        .failedLoginAttempts +
+                                                    1;
+                                            setState(() {});
+                                          }
+                                          GoRouter.of(context)
+                                              .prepareAuthEvent();
+                                          await authManager.signOut();
+                                          GoRouter.of(context)
+                                              .clearRedirectLocation();
+
+                                          return;
+                                        }
                                         if (valueOrDefault(
                                                 currentUserDocument?.role,
                                                 '') ==
@@ -434,20 +502,18 @@ class _Auth2LoginWidgetState extends State<Auth2LoginWidget>
                                             await showDialog(
                                               context: context,
                                               builder: (alertDialogContext) {
-                                                return WebViewAware(
-                                                  child: AlertDialog(
-                                                    title: Text('Invalid'),
-                                                    content: Text(
-                                                        'Your account is not yet approved by admin!'),
-                                                    actions: [
-                                                      TextButton(
-                                                        onPressed: () =>
-                                                            Navigator.pop(
-                                                                alertDialogContext),
-                                                        child: Text('Ok'),
-                                                      ),
-                                                    ],
-                                                  ),
+                                                return AlertDialog(
+                                                  title: Text('Invalid'),
+                                                  content: Text(
+                                                      'Your account is not yet approved by admin!'),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.pop(
+                                                              alertDialogContext),
+                                                      child: Text('Ok'),
+                                                    ),
+                                                  ],
                                                 );
                                               },
                                             );

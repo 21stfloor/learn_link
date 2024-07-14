@@ -2,6 +2,7 @@ import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/common/drawer_toggle/drawer_toggle_widget.dart';
 import '/components/session_entry_widget.dart';
+import '/components/subscription_payment_select_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
@@ -12,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 import 'teacher_my_sessions_page_model.dart';
 export 'teacher_my_sessions_page_model.dart';
 
@@ -63,6 +63,8 @@ class _TeacherMySessionsPageWidgetState
 
   @override
   Widget build(BuildContext context) {
+    context.watch<FFAppState>();
+
     return GestureDetector(
       onTap: () => _model.unfocusNode.canRequestFocus
           ? FocusScope.of(context).requestFocus(_model.unfocusNode)
@@ -72,12 +74,10 @@ class _TeacherMySessionsPageWidgetState
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
         drawer: Drawer(
           elevation: 16.0,
-          child: WebViewAware(
-            child: wrapWithModel(
-              model: _model.teacherSidebarModel,
-              updateCallback: () => setState(() {}),
-              child: TeacherSidebarWidget(),
-            ),
+          child: wrapWithModel(
+            model: _model.teacherSidebarModel,
+            updateCallback: () => setState(() {}),
+            child: TeacherSidebarWidget(),
           ),
         ),
         body: SafeArea(
@@ -197,7 +197,7 @@ class _TeacherMySessionsPageWidgetState
                                                         AlignmentDirectional(
                                                             0.0, 0.0),
                                                     child: Container(
-                                                      width: 1280.0,
+                                                      width: 2000.0,
                                                       height: MediaQuery.sizeOf(
                                                                   context)
                                                               .height *
@@ -255,7 +255,7 @@ class _TeacherMySessionsPageWidgetState
                                                                           .max,
                                                                   children: [
                                                                     Expanded(
-                                                                      flex: 3,
+                                                                      flex: 2,
                                                                       child:
                                                                           Text(
                                                                         'ID',
@@ -268,7 +268,7 @@ class _TeacherMySessionsPageWidgetState
                                                                       ),
                                                                     ),
                                                                     Expanded(
-                                                                      flex: 3,
+                                                                      flex: 1,
                                                                       child:
                                                                           Text(
                                                                         'Subject',
@@ -281,7 +281,7 @@ class _TeacherMySessionsPageWidgetState
                                                                       ),
                                                                     ),
                                                                     Expanded(
-                                                                      flex: 3,
+                                                                      flex: 1,
                                                                       child:
                                                                           Text(
                                                                         'Day',
@@ -294,7 +294,7 @@ class _TeacherMySessionsPageWidgetState
                                                                       ),
                                                                     ),
                                                                     Expanded(
-                                                                      flex: 3,
+                                                                      flex: 1,
                                                                       child:
                                                                           Text(
                                                                         'Start',
@@ -307,7 +307,7 @@ class _TeacherMySessionsPageWidgetState
                                                                       ),
                                                                     ),
                                                                     Expanded(
-                                                                      flex: 3,
+                                                                      flex: 1,
                                                                       child:
                                                                           Text(
                                                                         'End',
@@ -320,7 +320,7 @@ class _TeacherMySessionsPageWidgetState
                                                                       ),
                                                                     ),
                                                                     Expanded(
-                                                                      flex: 3,
+                                                                      flex: 1,
                                                                       child:
                                                                           Text(
                                                                         'Days remaining',
@@ -333,7 +333,7 @@ class _TeacherMySessionsPageWidgetState
                                                                       ),
                                                                     ),
                                                                     Expanded(
-                                                                      flex: 3,
+                                                                      flex: 1,
                                                                       child:
                                                                           Text(
                                                                         'No. Students',
@@ -351,7 +351,7 @@ class _TeacherMySessionsPageWidgetState
                                                                           Text(
                                                                         'Actions',
                                                                         textAlign:
-                                                                            TextAlign.center,
+                                                                            TextAlign.start,
                                                                         style: FlutterFlowTheme.of(context)
                                                                             .bodySmall
                                                                             .override(
@@ -406,6 +406,7 @@ class _TeacherMySessionsPageWidgetState
                                                                   listViewSessionsRecordList =
                                                                   snapshot
                                                                       .data!;
+
                                                               return ListView
                                                                   .builder(
                                                                 padding:
@@ -696,6 +697,7 @@ class _TeacherMySessionsPageWidgetState
                                                                   listViewSessionRequestsRecordList =
                                                                   snapshot
                                                                       .data!;
+
                                                               return ListView
                                                                   .builder(
                                                                 padding:
@@ -745,8 +747,10 @@ class _TeacherMySessionsPageWidgetState
                                                                             ),
                                                                           );
                                                                         }
+
                                                                         final containerSchedulesRecord =
                                                                             snapshot.data!;
+
                                                                         return Container(
                                                                           width:
                                                                               100.0,
@@ -797,7 +801,9 @@ class _TeacherMySessionsPageWidgetState
                                                                                           ),
                                                                                         );
                                                                                       }
+
                                                                                       final textUsersRecord = snapshot.data!;
+
                                                                                       return Text(
                                                                                         textUsersRecord.displayName,
                                                                                         style: FlutterFlowTheme.of(context).bodyMedium.override(
@@ -843,171 +849,222 @@ class _TeacherMySessionsPageWidgetState
                                                                                   child: Builder(
                                                                                     builder: (context) {
                                                                                       if (listViewSessionRequestsRecord.status == FFAppConstants.sessionRequestStatusPending) {
-                                                                                        return SingleChildScrollView(
-                                                                                          scrollDirection: Axis.horizontal,
-                                                                                          child: Row(
-                                                                                            mainAxisSize: MainAxisSize.min,
-                                                                                            mainAxisAlignment: MainAxisAlignment.center,
-                                                                                            children: [
-                                                                                              FFButtonWidget(
-                                                                                                onPressed: () async {
-                                                                                                  final firestoreBatch = FirebaseFirestore.instance.batch();
-                                                                                                  try {
-                                                                                                    var confirmDialogResponse = await showDialog<bool>(
-                                                                                                          context: context,
-                                                                                                          builder: (alertDialogContext) {
-                                                                                                            return WebViewAware(
-                                                                                                              child: AlertDialog(
-                                                                                                                title: Text('Confirm'),
-                                                                                                                content: Text('Are you sure you want to approve this student?'),
-                                                                                                                actions: [
-                                                                                                                  TextButton(
-                                                                                                                    onPressed: () => Navigator.pop(alertDialogContext, false),
-                                                                                                                    child: Text('Cancel'),
-                                                                                                                  ),
-                                                                                                                  TextButton(
-                                                                                                                    onPressed: () => Navigator.pop(alertDialogContext, true),
-                                                                                                                    child: Text('Confirm'),
-                                                                                                                  ),
-                                                                                                                ],
-                                                                                                              ),
-                                                                                                            );
-                                                                                                          },
-                                                                                                        ) ??
-                                                                                                        false;
-                                                                                                    if (confirmDialogResponse) {
-                                                                                                      if (listViewSessionRequestsRecord.session != null) {
-                                                                                                        firestoreBatch.update(listViewSessionRequestsRecord.session!, {
-                                                                                                          ...mapToFirestore(
-                                                                                                            {
-                                                                                                              'students': FieldValue.arrayUnion([
-                                                                                                                listViewSessionRequestsRecord.student
-                                                                                                              ]),
-                                                                                                            },
-                                                                                                          ),
-                                                                                                        });
-                                                                                                      } else {
-                                                                                                        firestoreBatch.set(SessionsRecord.collection.doc(), {
-                                                                                                          ...createSessionsRecordData(
-                                                                                                            teacher: currentUserReference,
-                                                                                                            daysRemaining: containerSchedulesRecord.totalDays,
-                                                                                                            schedule: listViewSessionRequestsRecord.schedule,
-                                                                                                            videoCallStatus: false,
-                                                                                                          ),
-                                                                                                          ...mapToFirestore(
-                                                                                                            {
-                                                                                                              'students': [
-                                                                                                                listViewSessionRequestsRecord.student
-                                                                                                              ],
-                                                                                                            },
-                                                                                                          ),
-                                                                                                        });
-                                                                                                      }
+                                                                                        return Builder(
+                                                                                          builder: (context) {
+                                                                                            if (FFAppState().subscribed) {
+                                                                                              return SingleChildScrollView(
+                                                                                                scrollDirection: Axis.horizontal,
+                                                                                                child: Row(
+                                                                                                  mainAxisSize: MainAxisSize.min,
+                                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                                  children: [
+                                                                                                    FFButtonWidget(
+                                                                                                      onPressed: () async {
+                                                                                                        final firestoreBatch = FirebaseFirestore.instance.batch();
+                                                                                                        try {
+                                                                                                          var confirmDialogResponse = await showDialog<bool>(
+                                                                                                                context: context,
+                                                                                                                builder: (alertDialogContext) {
+                                                                                                                  return AlertDialog(
+                                                                                                                    title: Text('Confirm'),
+                                                                                                                    content: Text('Are you sure you want to approve this student?'),
+                                                                                                                    actions: [
+                                                                                                                      TextButton(
+                                                                                                                        onPressed: () => Navigator.pop(alertDialogContext, false),
+                                                                                                                        child: Text('Cancel'),
+                                                                                                                      ),
+                                                                                                                      TextButton(
+                                                                                                                        onPressed: () => Navigator.pop(alertDialogContext, true),
+                                                                                                                        child: Text('Confirm'),
+                                                                                                                      ),
+                                                                                                                    ],
+                                                                                                                  );
+                                                                                                                },
+                                                                                                              ) ??
+                                                                                                              false;
+                                                                                                          if (confirmDialogResponse) {
+                                                                                                            if (listViewSessionRequestsRecord.session != null) {
+                                                                                                              firestoreBatch.update(listViewSessionRequestsRecord.session!, {
+                                                                                                                ...mapToFirestore(
+                                                                                                                  {
+                                                                                                                    'students': FieldValue.arrayUnion([
+                                                                                                                      listViewSessionRequestsRecord.student
+                                                                                                                    ]),
+                                                                                                                  },
+                                                                                                                ),
+                                                                                                              });
+                                                                                                            } else {
+                                                                                                              firestoreBatch.set(SessionsRecord.collection.doc(), {
+                                                                                                                ...createSessionsRecordData(
+                                                                                                                  teacher: currentUserReference,
+                                                                                                                  daysRemaining: containerSchedulesRecord.totalDays,
+                                                                                                                  schedule: listViewSessionRequestsRecord.schedule,
+                                                                                                                  videoCallStatus: false,
+                                                                                                                ),
+                                                                                                                ...mapToFirestore(
+                                                                                                                  {
+                                                                                                                    'students': [
+                                                                                                                      listViewSessionRequestsRecord.student
+                                                                                                                    ],
+                                                                                                                  },
+                                                                                                                ),
+                                                                                                              });
+                                                                                                            }
 
-                                                                                                      firestoreBatch.update(
-                                                                                                          listViewSessionRequestsRecord.reference,
-                                                                                                          createSessionRequestsRecordData(
-                                                                                                            status: FFAppConstants.sessionRequestStatusApproved,
-                                                                                                          ));
+                                                                                                            firestoreBatch.update(
+                                                                                                                listViewSessionRequestsRecord.reference,
+                                                                                                                createSessionRequestsRecordData(
+                                                                                                                  status: FFAppConstants.sessionRequestStatusApproved,
+                                                                                                                ));
 
-                                                                                                      context.pushNamed('teacherMySessionsPage');
-                                                                                                    }
-                                                                                                  } finally {
-                                                                                                    await firestoreBatch.commit();
-                                                                                                  }
-                                                                                                },
-                                                                                                text: 'Approve',
-                                                                                                icon: Icon(
-                                                                                                  Icons.check_sharp,
-                                                                                                  size: 15.0,
-                                                                                                ),
-                                                                                                options: FFButtonOptions(
-                                                                                                  height: 40.0,
-                                                                                                  padding: EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
-                                                                                                  iconPadding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                                                                                                  color: FlutterFlowTheme.of(context).primary,
-                                                                                                  textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                                                                                                        fontFamily: 'Readex Pro',
-                                                                                                        color: Colors.white,
-                                                                                                        letterSpacing: 0.0,
+                                                                                                            context.pushNamed('teacherMySessionsPage');
+                                                                                                          }
+                                                                                                        } finally {
+                                                                                                          await firestoreBatch.commit();
+                                                                                                        }
+                                                                                                      },
+                                                                                                      text: 'Approve',
+                                                                                                      icon: Icon(
+                                                                                                        Icons.check_sharp,
+                                                                                                        size: 15.0,
                                                                                                       ),
-                                                                                                  elevation: 3.0,
-                                                                                                  borderSide: BorderSide(
-                                                                                                    color: Colors.transparent,
-                                                                                                    width: 1.0,
-                                                                                                  ),
-                                                                                                  borderRadius: BorderRadius.circular(8.0),
-                                                                                                ),
-                                                                                              ),
-                                                                                              FFButtonWidget(
-                                                                                                onPressed: () async {
-                                                                                                  var confirmDialogResponse = await showDialog<bool>(
-                                                                                                        context: context,
-                                                                                                        builder: (alertDialogContext) {
-                                                                                                          return WebViewAware(
-                                                                                                            child: AlertDialog(
-                                                                                                              title: Text('Confirm'),
-                                                                                                              content: Text('Are you sure you want to reject this student?'),
-                                                                                                              actions: [
-                                                                                                                TextButton(
-                                                                                                                  onPressed: () => Navigator.pop(alertDialogContext, false),
-                                                                                                                  child: Text('Cancel'),
+                                                                                                      options: FFButtonOptions(
+                                                                                                        height: 40.0,
+                                                                                                        padding: EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
+                                                                                                        iconPadding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                                                                                                        color: FlutterFlowTheme.of(context).primary,
+                                                                                                        textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                                                                                                              fontFamily: 'Readex Pro',
+                                                                                                              color: Colors.white,
+                                                                                                              letterSpacing: 0.0,
+                                                                                                            ),
+                                                                                                        elevation: 3.0,
+                                                                                                        borderSide: BorderSide(
+                                                                                                          color: Colors.transparent,
+                                                                                                          width: 1.0,
+                                                                                                        ),
+                                                                                                        borderRadius: BorderRadius.circular(8.0),
+                                                                                                      ),
+                                                                                                    ),
+                                                                                                    FFButtonWidget(
+                                                                                                      onPressed: () async {
+                                                                                                        var confirmDialogResponse = await showDialog<bool>(
+                                                                                                              context: context,
+                                                                                                              builder: (alertDialogContext) {
+                                                                                                                return AlertDialog(
+                                                                                                                  title: Text('Confirm'),
+                                                                                                                  content: Text('Are you sure you want to reject this student?'),
+                                                                                                                  actions: [
+                                                                                                                    TextButton(
+                                                                                                                      onPressed: () => Navigator.pop(alertDialogContext, false),
+                                                                                                                      child: Text('Cancel'),
+                                                                                                                    ),
+                                                                                                                    TextButton(
+                                                                                                                      onPressed: () => Navigator.pop(alertDialogContext, true),
+                                                                                                                      child: Text('Confirm'),
+                                                                                                                    ),
+                                                                                                                  ],
+                                                                                                                );
+                                                                                                              },
+                                                                                                            ) ??
+                                                                                                            false;
+                                                                                                        if (confirmDialogResponse) {
+                                                                                                          await listViewSessionRequestsRecord.reference.update(createSessionRequestsRecordData(
+                                                                                                            status: FFAppConstants.sessionRequestStatusReject,
+                                                                                                          ));
+                                                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                                                            SnackBar(
+                                                                                                              content: Text(
+                                                                                                                'Session request was rejected successfully!',
+                                                                                                                style: TextStyle(
+                                                                                                                  color: FlutterFlowTheme.of(context).primaryText,
                                                                                                                 ),
-                                                                                                                TextButton(
-                                                                                                                  onPressed: () => Navigator.pop(alertDialogContext, true),
-                                                                                                                  child: Text('Confirm'),
-                                                                                                                ),
-                                                                                                              ],
+                                                                                                              ),
+                                                                                                              duration: Duration(milliseconds: 4000),
+                                                                                                              backgroundColor: FlutterFlowTheme.of(context).secondary,
                                                                                                             ),
                                                                                                           );
-                                                                                                        },
-                                                                                                      ) ??
-                                                                                                      false;
-                                                                                                  if (confirmDialogResponse) {
-                                                                                                    await listViewSessionRequestsRecord.reference.update(createSessionRequestsRecordData(
-                                                                                                      status: FFAppConstants.sessionRequestStatusReject,
-                                                                                                    ));
-                                                                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                                                                      SnackBar(
-                                                                                                        content: Text(
-                                                                                                          'Session request was rejected successfully!',
-                                                                                                          style: TextStyle(
-                                                                                                            color: FlutterFlowTheme.of(context).primaryText,
-                                                                                                          ),
-                                                                                                        ),
-                                                                                                        duration: Duration(milliseconds: 4000),
-                                                                                                        backgroundColor: FlutterFlowTheme.of(context).secondary,
-                                                                                                      ),
-                                                                                                    );
-                                                                                                  }
+                                                                                                        }
 
-                                                                                                  context.pushNamed('teacherMySessionsPage');
-                                                                                                },
-                                                                                                text: 'Reject',
-                                                                                                icon: Icon(
-                                                                                                  Icons.close,
-                                                                                                  size: 15.0,
-                                                                                                ),
-                                                                                                options: FFButtonOptions(
-                                                                                                  height: 40.0,
-                                                                                                  padding: EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
-                                                                                                  iconPadding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                                                                                                  color: FlutterFlowTheme.of(context).error,
-                                                                                                  textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                                                                                                        fontFamily: 'Readex Pro',
-                                                                                                        color: Colors.white,
-                                                                                                        letterSpacing: 0.0,
+                                                                                                        context.pushNamed('teacherMySessionsPage');
+                                                                                                      },
+                                                                                                      text: 'Reject',
+                                                                                                      icon: Icon(
+                                                                                                        Icons.close,
+                                                                                                        size: 15.0,
                                                                                                       ),
-                                                                                                  elevation: 3.0,
-                                                                                                  borderSide: BorderSide(
-                                                                                                    color: Colors.transparent,
-                                                                                                    width: 1.0,
-                                                                                                  ),
-                                                                                                  borderRadius: BorderRadius.circular(8.0),
+                                                                                                      options: FFButtonOptions(
+                                                                                                        height: 40.0,
+                                                                                                        padding: EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
+                                                                                                        iconPadding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                                                                                                        color: FlutterFlowTheme.of(context).error,
+                                                                                                        textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                                                                                                              fontFamily: 'Readex Pro',
+                                                                                                              color: Colors.white,
+                                                                                                              letterSpacing: 0.0,
+                                                                                                            ),
+                                                                                                        elevation: 3.0,
+                                                                                                        borderSide: BorderSide(
+                                                                                                          color: Colors.transparent,
+                                                                                                          width: 1.0,
+                                                                                                        ),
+                                                                                                        borderRadius: BorderRadius.circular(8.0),
+                                                                                                      ),
+                                                                                                    ),
+                                                                                                  ],
                                                                                                 ),
-                                                                                              ),
-                                                                                            ],
-                                                                                          ),
+                                                                                              );
+                                                                                            } else {
+                                                                                              return Builder(
+                                                                                                builder: (context) => FFButtonWidget(
+                                                                                                  onPressed: () async {
+                                                                                                    await showDialog(
+                                                                                                      context: context,
+                                                                                                      builder: (dialogContext) {
+                                                                                                        return Dialog(
+                                                                                                          elevation: 0,
+                                                                                                          insetPadding: EdgeInsets.zero,
+                                                                                                          backgroundColor: Colors.transparent,
+                                                                                                          alignment: AlignmentDirectional(0.0, 0.0).resolve(Directionality.of(context)),
+                                                                                                          child: GestureDetector(
+                                                                                                            onTap: () => _model.unfocusNode.canRequestFocus ? FocusScope.of(context).requestFocus(_model.unfocusNode) : FocusScope.of(context).unfocus(),
+                                                                                                            child: SubscriptionPaymentSelectWidget(
+                                                                                                              role: valueOrDefault(currentUserDocument?.role, ''),
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                        );
+                                                                                                      },
+                                                                                                    ).then((value) => setState(() {}));
+                                                                                                  },
+                                                                                                  text: 'Subscribe to unlock',
+                                                                                                  icon: Icon(
+                                                                                                    Icons.stars_sharp,
+                                                                                                    size: 15.0,
+                                                                                                  ),
+                                                                                                  options: FFButtonOptions(
+                                                                                                    width: 200.0,
+                                                                                                    height: 40.0,
+                                                                                                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                                                                                                    iconPadding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                                                                                                    color: FlutterFlowTheme.of(context).accent3,
+                                                                                                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                                                                                                          fontFamily: 'Plus Jakarta Sans',
+                                                                                                          color: Color(0xFF14181B),
+                                                                                                          fontSize: 16.0,
+                                                                                                          letterSpacing: 0.0,
+                                                                                                          fontWeight: FontWeight.bold,
+                                                                                                        ),
+                                                                                                    elevation: 0.0,
+                                                                                                    borderSide: BorderSide(
+                                                                                                      color: Color(0xFF4B39EF),
+                                                                                                      width: 2.0,
+                                                                                                    ),
+                                                                                                    borderRadius: BorderRadius.circular(12.0),
+                                                                                                  ),
+                                                                                                ),
+                                                                                              );
+                                                                                            }
+                                                                                          },
                                                                                         );
                                                                                       } else {
                                                                                         return Row(

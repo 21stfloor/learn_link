@@ -11,9 +11,9 @@ import '/student/teacher_select_entry/teacher_select_entry_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 import 'book_session_model.dart';
 export 'book_session_model.dart';
 
@@ -38,6 +38,28 @@ class _BookSessionWidgetState extends State<BookSessionWidget> {
     super.initState();
     _model = createModel(context, () => BookSessionModel());
 
+    // On component load action.
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      _model.existingSessionRequests = await querySessionRequestsRecordOnce(
+        queryBuilder: (sessionRequestsRecord) => sessionRequestsRecord
+            .where(
+              'status',
+              isNotEqualTo: FFAppConstants.sessionRequestStatusReject,
+            )
+            .where(
+              'student',
+              isEqualTo: currentUserReference,
+            ),
+      );
+      _model.existingScheduleList = _model.existingSessionRequests!
+          .map((e) => e.schedule)
+          .withoutNulls
+          .toList()
+          .toList()
+          .cast<DocumentReference>();
+      setState(() {});
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
   }
 
@@ -51,6 +73,18 @@ class _BookSessionWidgetState extends State<BookSessionWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: () {
+        if (MediaQuery.sizeOf(context).width < kBreakpointSmall) {
+          return 360.0;
+        } else if (MediaQuery.sizeOf(context).width < kBreakpointMedium) {
+          return 980.0;
+        } else if (MediaQuery.sizeOf(context).width < kBreakpointLarge) {
+          return 1024.0;
+        } else {
+          return 1024.0;
+        }
+      }(),
+      height: 700.0,
       decoration: BoxDecoration(
         color: FlutterFlowTheme.of(context).primaryBackground,
       ),
@@ -188,6 +222,7 @@ class _BookSessionWidgetState extends State<BookSessionWidget> {
                                               List<SubjectsRecord>
                                                   subjectSubjectsRecordList =
                                                   snapshot.data!;
+
                                               return FlutterFlowDropDown<
                                                   String>(
                                                 controller: _model
@@ -198,9 +233,44 @@ class _BookSessionWidgetState extends State<BookSessionWidget> {
                                                     subjectSubjectsRecordList
                                                         .map((e) => e.name)
                                                         .toList(),
-                                                onChanged: (val) => setState(
-                                                    () => _model.subjectValue =
-                                                        val),
+                                                onChanged: (val) async {
+                                                  setState(() => _model
+                                                      .subjectValue = val);
+                                                  _model.scheduleResults =
+                                                      await querySchedulesRecordOnce(
+                                                    queryBuilder:
+                                                        (schedulesRecord) =>
+                                                            schedulesRecord
+                                                                .where(
+                                                      'subject',
+                                                      isEqualTo:
+                                                          _model.subjectValue,
+                                                    ),
+                                                  );
+                                                  if (_model
+                                                      .existingScheduleList
+                                                      .isNotEmpty) {
+                                                    _model.schedulesToShow = _model
+                                                        .scheduleResults!
+                                                        .where((e) => !_model
+                                                            .existingScheduleList
+                                                            .contains(
+                                                                e.reference))
+                                                        .toList()
+                                                        .cast<
+                                                            SchedulesRecord>();
+                                                    setState(() {});
+                                                  } else {
+                                                    _model.schedulesToShow = _model
+                                                        .scheduleResults!
+                                                        .toList()
+                                                        .cast<
+                                                            SchedulesRecord>();
+                                                    setState(() {});
+                                                  }
+
+                                                  setState(() {});
+                                                },
                                                 width: 300.0,
                                                 height: 56.0,
                                                 textStyle:
@@ -258,103 +328,92 @@ class _BookSessionWidgetState extends State<BookSessionWidget> {
                                         letterSpacing: 0.0,
                                       ),
                                 ),
-                                Container(
-                                  width: double.infinity,
-                                  height: 300.0,
-                                  decoration: BoxDecoration(),
-                                  child: StreamBuilder<List<SchedulesRecord>>(
-                                    stream: querySchedulesRecord(
-                                      queryBuilder: (schedulesRecord) =>
-                                          schedulesRecord.where(
-                                        'subject',
-                                        isEqualTo: _model.subjectValue != ''
-                                            ? _model.subjectValue
-                                            : null,
-                                        isNull: (_model.subjectValue != ''
-                                                ? _model.subjectValue
-                                                : null) ==
-                                            null,
+                                Expanded(
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: 360.0,
+                                    decoration: BoxDecoration(),
+                                    child: SingleChildScrollView(
+                                      primary: false,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          Builder(
+                                            builder: (context) {
+                                              final rows = _model
+                                                  .schedulesToShow
+                                                  .toList();
+                                              if (rows.isEmpty) {
+                                                return EmptyTeacherResultWidget();
+                                              }
+
+                                              return Wrap(
+                                                spacing: 0.0,
+                                                runSpacing: 0.0,
+                                                alignment: WrapAlignment.start,
+                                                crossAxisAlignment:
+                                                    WrapCrossAlignment.start,
+                                                direction: Axis.horizontal,
+                                                runAlignment:
+                                                    WrapAlignment.spaceEvenly,
+                                                verticalDirection:
+                                                    VerticalDirection.down,
+                                                clipBehavior: Clip.none,
+                                                children: List.generate(
+                                                    rows.length, (rowsIndex) {
+                                                  final rowsItem =
+                                                      rows[rowsIndex];
+                                                  return wrapWithModel(
+                                                    model: _model
+                                                        .teacherSelectEntryModels
+                                                        .getModel(
+                                                      rowsItem.reference.id,
+                                                      rowsIndex,
+                                                    ),
+                                                    updateCallback: () =>
+                                                        setState(() {}),
+                                                    child:
+                                                        TeacherSelectEntryWidget(
+                                                      key: Key(
+                                                        'Key4m2_${rowsItem.reference.id}',
+                                                      ),
+                                                      schedule: rowsItem,
+                                                      selectAction:
+                                                          (selectedSchedule) async {
+                                                        _model.selectedSchedule =
+                                                            selectedSchedule;
+                                                        setState(() {});
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                          SnackBar(
+                                                            content: Text(
+                                                              'Teacher was selected',
+                                                              style: TextStyle(
+                                                                color: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .primaryText,
+                                                              ),
+                                                            ),
+                                                            duration: Duration(
+                                                                milliseconds:
+                                                                    2500),
+                                                            backgroundColor:
+                                                                FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .secondary,
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+                                                  );
+                                                }),
+                                              );
+                                            },
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    builder: (context, snapshot) {
-                                      // Customize what your widget looks like when it's loading.
-                                      if (!snapshot.hasData) {
-                                        return Center(
-                                          child: SizedBox(
-                                            width: 50.0,
-                                            height: 50.0,
-                                            child: CircularProgressIndicator(
-                                              valueColor:
-                                                  AlwaysStoppedAnimation<Color>(
-                                                FlutterFlowTheme.of(context)
-                                                    .primary,
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                      List<SchedulesRecord>
-                                          listViewSchedulesRecordList =
-                                          snapshot.data!;
-                                      if (listViewSchedulesRecordList.isEmpty) {
-                                        return EmptyTeacherResultWidget();
-                                      }
-                                      return ListView.builder(
-                                        padding: EdgeInsets.zero,
-                                        shrinkWrap: true,
-                                        scrollDirection: Axis.vertical,
-                                        itemCount:
-                                            listViewSchedulesRecordList.length,
-                                        itemBuilder: (context, listViewIndex) {
-                                          final listViewSchedulesRecord =
-                                              listViewSchedulesRecordList[
-                                                  listViewIndex];
-                                          return wrapWithModel(
-                                            model: _model
-                                                .teacherSelectEntryModels
-                                                .getModel(
-                                              listViewSchedulesRecord
-                                                  .reference.id,
-                                              listViewIndex,
-                                            ),
-                                            updateCallback: () =>
-                                                setState(() {}),
-                                            child: TeacherSelectEntryWidget(
-                                              key: Key(
-                                                'Key4m2_${listViewSchedulesRecord.reference.id}',
-                                              ),
-                                              schedule: listViewSchedulesRecord,
-                                              selectAction:
-                                                  (selectedSchedule) async {
-                                                _model.selectedSchedule =
-                                                    selectedSchedule;
-                                                setState(() {});
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      'Teacher was selected',
-                                                      style: TextStyle(
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primaryText,
-                                                      ),
-                                                    ),
-                                                    duration: Duration(
-                                                        milliseconds: 2500),
-                                                    backgroundColor:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .secondary,
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    },
                                   ),
                                 ),
                               ]
@@ -373,23 +432,25 @@ class _BookSessionWidgetState extends State<BookSessionWidget> {
                   maxWidth: 770.0,
                 ),
                 decoration: BoxDecoration(),
-                child: Padding(
-                  padding:
-                      EdgeInsetsDirectional.fromSTEB(16.0, 12.0, 16.0, 12.0),
-                  child: FFButtonWidget(
-                    onPressed: () async {
-                      final firestoreBatch = FirebaseFirestore.instance.batch();
-                      try {
-                        if (_model.formKey.currentState == null ||
-                            !_model.formKey.currentState!.validate()) {
-                          return;
-                        }
-                        if (_model.subjectValue == null) {
-                          await showDialog(
-                            context: context,
-                            builder: (alertDialogContext) {
-                              return WebViewAware(
-                                child: AlertDialog(
+                child: Visibility(
+                  visible: false,
+                  child: Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 12.0, 16.0, 12.0),
+                    child: FFButtonWidget(
+                      onPressed: () async {
+                        final firestoreBatch =
+                            FirebaseFirestore.instance.batch();
+                        try {
+                          if (_model.formKey.currentState == null ||
+                              !_model.formKey.currentState!.validate()) {
+                            return;
+                          }
+                          if (_model.subjectValue == null) {
+                            await showDialog(
+                              context: context,
+                              builder: (alertDialogContext) {
+                                return AlertDialog(
                                   title: Text('Invalid'),
                                   content:
                                       Text('Please select a valid subject'),
@@ -400,18 +461,16 @@ class _BookSessionWidgetState extends State<BookSessionWidget> {
                                       child: Text('Ok'),
                                     ),
                                   ],
-                                ),
-                              );
-                            },
-                          );
-                          return;
-                        }
-                        if (_model.selectedSchedule == null) {
-                          await showDialog(
-                            context: context,
-                            builder: (alertDialogContext) {
-                              return WebViewAware(
-                                child: AlertDialog(
+                                );
+                              },
+                            );
+                            return;
+                          }
+                          if (_model.selectedSchedule == null) {
+                            await showDialog(
+                              context: context,
+                              builder: (alertDialogContext) {
+                                return AlertDialog(
                                   title: Text('Invalid'),
                                   content: Text('Please select a teacher'),
                                   actions: [
@@ -421,88 +480,90 @@ class _BookSessionWidgetState extends State<BookSessionWidget> {
                                       child: Text('Ok'),
                                     ),
                                   ],
-                                ),
-                              );
-                            },
-                          );
-                        } else {
-                          _model.existingSession =
-                              await querySessionsRecordOnce(
-                            queryBuilder: (sessionsRecord) =>
-                                sessionsRecord.where(
-                              'schedule',
-                              isEqualTo: _model.selectedSchedule?.reference,
-                            ),
-                            singleRecord: true,
-                          ).then((s) => s.firstOrNull);
-                          if (_model.existingSession?.reference != null) {
-                            firestoreBatch.set(
-                                SessionRequestsRecord.collection.doc(),
-                                createSessionRequestsRecordData(
-                                  student: currentUserReference,
-                                  status: FFAppConstants
-                                      .sessionRequestStatusPending,
-                                  session: _model.existingSession?.reference,
-                                  subject: _model.subjectValue,
-                                  teacher: _model.selectedSchedule?.teacher,
-                                  schedule: _model.selectedSchedule?.reference,
-                                ));
+                                );
+                              },
+                            );
                           } else {
-                            firestoreBatch.set(
-                                SessionRequestsRecord.collection.doc(),
-                                createSessionRequestsRecordData(
-                                  student: currentUserReference,
-                                  status: FFAppConstants
-                                      .sessionRequestStatusPending,
-                                  subject: _model.subjectValue,
-                                  teacher: _model.selectedSchedule?.teacher,
-                                  schedule: _model.selectedSchedule?.reference,
-                                ));
-                          }
+                            _model.existingSession =
+                                await querySessionsRecordOnce(
+                              queryBuilder: (sessionsRecord) =>
+                                  sessionsRecord.where(
+                                'schedule',
+                                isEqualTo: _model.selectedSchedule?.reference,
+                              ),
+                              singleRecord: true,
+                            ).then((s) => s.firstOrNull);
+                            if (_model.existingSession?.reference != null) {
+                              firestoreBatch.set(
+                                  SessionRequestsRecord.collection.doc(),
+                                  createSessionRequestsRecordData(
+                                    student: currentUserReference,
+                                    status: FFAppConstants
+                                        .sessionRequestStatusPending,
+                                    session: _model.existingSession?.reference,
+                                    subject: _model.subjectValue,
+                                    teacher: _model.selectedSchedule?.teacher,
+                                    schedule:
+                                        _model.selectedSchedule?.reference,
+                                  ));
+                            } else {
+                              firestoreBatch.set(
+                                  SessionRequestsRecord.collection.doc(),
+                                  createSessionRequestsRecordData(
+                                    student: currentUserReference,
+                                    status: FFAppConstants
+                                        .sessionRequestStatusPending,
+                                    subject: _model.subjectValue,
+                                    teacher: _model.selectedSchedule?.teacher,
+                                    schedule:
+                                        _model.selectedSchedule?.reference,
+                                  ));
+                            }
 
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Your booking session was sent to the teacher!',
-                                style: TextStyle(
-                                  color:
-                                      FlutterFlowTheme.of(context).primaryText,
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Your booking session was sent to the teacher!',
+                                  style: TextStyle(
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                  ),
                                 ),
+                                duration: Duration(milliseconds: 4000),
+                                backgroundColor:
+                                    FlutterFlowTheme.of(context).secondary,
                               ),
-                              duration: Duration(milliseconds: 4000),
-                              backgroundColor:
-                                  FlutterFlowTheme.of(context).secondary,
-                            ),
-                          );
+                            );
+                          }
+                        } finally {
+                          await firestoreBatch.commit();
                         }
-                      } finally {
-                        await firestoreBatch.commit();
-                      }
 
-                      setState(() {});
-                    },
-                    text: 'Request Appointment',
-                    options: FFButtonOptions(
-                      width: double.infinity,
-                      height: 48.0,
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
-                      iconPadding:
-                          EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                      color: FlutterFlowTheme.of(context).primary,
-                      textStyle:
-                          FlutterFlowTheme.of(context).titleSmall.override(
-                                fontFamily: 'Readex Pro',
-                                color: Colors.white,
-                                letterSpacing: 0.0,
-                              ),
-                      elevation: 3.0,
-                      borderSide: BorderSide(
-                        color: Colors.transparent,
-                        width: 1.0,
+                        setState(() {});
+                      },
+                      text: 'Request Appointment',
+                      options: FFButtonOptions(
+                        width: double.infinity,
+                        height: 48.0,
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            24.0, 0.0, 24.0, 0.0),
+                        iconPadding:
+                            EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                        color: FlutterFlowTheme.of(context).primary,
+                        textStyle:
+                            FlutterFlowTheme.of(context).titleSmall.override(
+                                  fontFamily: 'Readex Pro',
+                                  color: Colors.white,
+                                  letterSpacing: 0.0,
+                                ),
+                        elevation: 3.0,
+                        borderSide: BorderSide(
+                          color: Colors.transparent,
+                          width: 1.0,
+                        ),
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
-                      borderRadius: BorderRadius.circular(8.0),
                     ),
                   ),
                 ),

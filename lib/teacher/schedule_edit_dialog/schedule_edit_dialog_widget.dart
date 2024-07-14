@@ -15,17 +15,16 @@ import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 import 'schedule_edit_dialog_model.dart';
 export 'schedule_edit_dialog_model.dart';
 
 class ScheduleEditDialogWidget extends StatefulWidget {
   const ScheduleEditDialogWidget({
     super.key,
-    this.schedule,
+    this.scheduleToEdit,
   });
 
-  final SchedulesRecord? schedule;
+  final SchedulesRecord? scheduleToEdit;
 
   @override
   State<ScheduleEditDialogWidget> createState() =>
@@ -48,12 +47,24 @@ class _ScheduleEditDialogWidgetState extends State<ScheduleEditDialogWidget> {
 
     // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      if (widget.schedule != null) {
-        _model.selectedStart = widget.schedule?.startTime;
-        _model.selectedEnd = widget.schedule?.endTime;
+      if (widget!.scheduleToEdit != null) {
+        _model.selectedStart = widget!.scheduleToEdit?.startTime;
+        _model.selectedEnd = widget!.scheduleToEdit?.endTime;
         setState(() {});
       }
     });
+
+    _model.topicTextController ??= TextEditingController(
+        text: widget!.scheduleToEdit != null
+            ? widget!.scheduleToEdit?.topics
+            : '');
+    _model.topicFocusNode ??= FocusNode();
+
+    _model.priceTextController ??= TextEditingController(
+        text: widget!.scheduleToEdit != null
+            ? widget!.scheduleToEdit?.price?.toString()
+            : '0');
+    _model.priceFocusNode ??= FocusNode();
 
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
   }
@@ -72,7 +83,18 @@ class _ScheduleEditDialogWidgetState extends State<ScheduleEditDialogWidget> {
       child: Padding(
         padding: EdgeInsetsDirectional.fromSTEB(16.0, 12.0, 16.0, 12.0),
         child: Container(
-          width: double.infinity,
+          width: () {
+            if (MediaQuery.sizeOf(context).width < kBreakpointSmall) {
+              return 360.0;
+            } else if (MediaQuery.sizeOf(context).width < kBreakpointMedium) {
+              return 800.0;
+            } else if (MediaQuery.sizeOf(context).width < kBreakpointLarge) {
+              return 1024.0;
+            } else {
+              return 360.0;
+            }
+          }(),
+          height: 620.0,
           constraints: BoxConstraints(
             maxWidth: 530.0,
           ),
@@ -126,6 +148,65 @@ class _ScheduleEditDialogWidgetState extends State<ScheduleEditDialogWidget> {
                                       letterSpacing: 0.0,
                                     ),
                               ),
+                              TextFormField(
+                                controller: _model.topicTextController,
+                                focusNode: _model.topicFocusNode,
+                                autofocus: true,
+                                obscureText: false,
+                                decoration: InputDecoration(
+                                  labelText: 'Lesson name',
+                                  labelStyle: FlutterFlowTheme.of(context)
+                                      .labelMedium
+                                      .override(
+                                        fontFamily: 'Readex Pro',
+                                        letterSpacing: 0.0,
+                                      ),
+                                  hintStyle: FlutterFlowTheme.of(context)
+                                      .labelMedium
+                                      .override(
+                                        fontFamily: 'Readex Pro',
+                                        letterSpacing: 0.0,
+                                      ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: FlutterFlowTheme.of(context)
+                                          .alternate,
+                                      width: 2.0,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color:
+                                          FlutterFlowTheme.of(context).primary,
+                                      width: 2.0,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: FlutterFlowTheme.of(context).error,
+                                      width: 2.0,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  focusedErrorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: FlutterFlowTheme.of(context).error,
+                                      width: 2.0,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                ),
+                                style: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .override(
+                                      fontFamily: 'Readex Pro',
+                                      letterSpacing: 0.0,
+                                    ),
+                                validator: _model.topicTextControllerValidator
+                                    .asValidator(context),
+                              ),
                               Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
                                     0.0, 16.0, 0.0, 0.0),
@@ -151,13 +232,15 @@ class _ScheduleEditDialogWidgetState extends State<ScheduleEditDialogWidget> {
                                     List<SubjectsRecord>
                                         subjectSubjectsRecordList =
                                         snapshot.data!;
+
                                     return FlutterFlowDropDown<String>(
                                       controller:
                                           _model.subjectValueController ??=
                                               FormFieldController<String>(
                                         _model.subjectValue ??=
-                                            widget.schedule != null
-                                                ? widget.schedule?.subject
+                                            widget!.scheduleToEdit != null
+                                                ? widget!
+                                                    .scheduleToEdit?.subject
                                                 : '',
                                       ),
                                       options: subjectSubjectsRecordList
@@ -203,9 +286,10 @@ class _ScheduleEditDialogWidgetState extends State<ScheduleEditDialogWidget> {
                                 child: FlutterFlowDropDown<String>(
                                   controller: _model.dayValueController ??=
                                       FormFieldController<String>(
-                                    _model.dayValue ??= widget.schedule != null
-                                        ? widget.schedule?.day
-                                        : '',
+                                    _model.dayValue ??=
+                                        widget!.scheduleToEdit != null
+                                            ? widget!.scheduleToEdit?.day
+                                            : '',
                                   ),
                                   options: FFAppConstants.days,
                                   onChanged: (val) =>
@@ -552,6 +636,87 @@ class _ScheduleEditDialogWidgetState extends State<ScheduleEditDialogWidget> {
                                   maximum: 30,
                                 ),
                               ),
+                              Padding(
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                    8.0, 12.0, 8.0, 0.0),
+                                child: Container(
+                                  width: double.infinity,
+                                  child: TextFormField(
+                                    controller: _model.priceTextController,
+                                    focusNode: _model.priceFocusNode,
+                                    autofocus: true,
+                                    obscureText: false,
+                                    decoration: InputDecoration(
+                                      labelText: 'Price',
+                                      labelStyle: FlutterFlowTheme.of(context)
+                                          .labelMedium
+                                          .override(
+                                            fontFamily: 'Readex Pro',
+                                            fontSize: 18.0,
+                                            letterSpacing: 0.0,
+                                          ),
+                                      hintStyle: FlutterFlowTheme.of(context)
+                                          .labelMedium
+                                          .override(
+                                            fontFamily: 'Readex Pro',
+                                            letterSpacing: 0.0,
+                                          ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: FlutterFlowTheme.of(context)
+                                              .alternate,
+                                          width: 2.0,
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: FlutterFlowTheme.of(context)
+                                              .primary,
+                                          width: 2.0,
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                      errorBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: FlutterFlowTheme.of(context)
+                                              .error,
+                                          width: 2.0,
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                      focusedErrorBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: FlutterFlowTheme.of(context)
+                                              .error,
+                                          width: 2.0,
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                      prefixIcon: FaIcon(
+                                        FontAwesomeIcons.tag,
+                                      ),
+                                    ),
+                                    style: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .override(
+                                          fontFamily: 'Readex Pro',
+                                          fontSize: 18.0,
+                                          letterSpacing: 0.0,
+                                        ),
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                            decimal: true),
+                                    validator: _model
+                                        .priceTextControllerValidator
+                                        .asValidator(context),
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -609,19 +774,17 @@ class _ScheduleEditDialogWidgetState extends State<ScheduleEditDialogWidget> {
                                 await showDialog(
                                   context: context,
                                   builder: (alertDialogContext) {
-                                    return WebViewAware(
-                                      child: AlertDialog(
-                                        title: Text('Invalid'),
-                                        content: Text(
-                                            'Please select a valid subject'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () => Navigator.pop(
-                                                alertDialogContext),
-                                            child: Text('Ok'),
-                                          ),
-                                        ],
-                                      ),
+                                    return AlertDialog(
+                                      title: Text('Invalid'),
+                                      content:
+                                          Text('Please select a valid subject'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(alertDialogContext),
+                                          child: Text('Ok'),
+                                        ),
+                                      ],
                                     );
                                   },
                                 );
@@ -631,85 +794,59 @@ class _ScheduleEditDialogWidgetState extends State<ScheduleEditDialogWidget> {
                                 await showDialog(
                                   context: context,
                                   builder: (alertDialogContext) {
-                                    return WebViewAware(
-                                      child: AlertDialog(
-                                        title: Text('Invalid'),
-                                        content:
-                                            Text('Please select a valid day'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () => Navigator.pop(
-                                                alertDialogContext),
-                                            child: Text('Ok'),
-                                          ),
-                                        ],
-                                      ),
+                                    return AlertDialog(
+                                      title: Text('Invalid'),
+                                      content:
+                                          Text('Please select a valid day'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(alertDialogContext),
+                                          child: Text('Ok'),
+                                        ),
+                                      ],
                                     );
                                   },
                                 );
                                 return;
                               }
-                              if (_model.datePicked1 == null) {
+                              if ((_model.selectedStart == null) ||
+                                  (_model.selectedEnd == null)) {
                                 await showDialog(
                                   context: context,
                                   builder: (alertDialogContext) {
-                                    return WebViewAware(
-                                      child: AlertDialog(
-                                        title: Text('Invalid'),
-                                        content: Text(
-                                            'Please select a valid start time'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () => Navigator.pop(
-                                                alertDialogContext),
-                                            child: Text('Ok'),
-                                          ),
-                                        ],
-                                      ),
+                                    return AlertDialog(
+                                      title: Text('Invalid'),
+                                      content: Text(
+                                          'Please select a valid start and end date!'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(alertDialogContext),
+                                          child: Text('Ok'),
+                                        ),
+                                      ],
                                     );
                                   },
                                 );
-                                return;
-                              }
-                              if (_model.datePicked2 == null) {
-                                await showDialog(
-                                  context: context,
-                                  builder: (alertDialogContext) {
-                                    return WebViewAware(
-                                      child: AlertDialog(
-                                        title: Text('Invalid'),
-                                        content: Text(
-                                            'Please select a valid end time'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () => Navigator.pop(
-                                                alertDialogContext),
-                                            child: Text('Ok'),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                );
+                                if (_shouldSetState) setState(() {});
                                 return;
                               }
                               if (_model.selectedStart! > _model.selectedEnd!) {
                                 await showDialog(
                                   context: context,
                                   builder: (alertDialogContext) {
-                                    return WebViewAware(
-                                      child: AlertDialog(
-                                        title: Text('Invalid'),
-                                        content: Text(
-                                            'Please select a valid start and end time range!'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () => Navigator.pop(
-                                                alertDialogContext),
-                                            child: Text('Ok'),
-                                          ),
-                                        ],
-                                      ),
+                                    return AlertDialog(
+                                      title: Text('Invalid'),
+                                      content: Text(
+                                          'Please select a valid start and end time range!'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(alertDialogContext),
+                                          child: Text('Ok'),
+                                        ),
+                                      ],
                                     );
                                   },
                                 );
@@ -755,13 +892,25 @@ class _ScheduleEditDialogWidgetState extends State<ScheduleEditDialogWidget> {
                                               .possibleConflictsSchedules![
                                                   _model.iterator]
                                               .endTime!)) {
-                                    _model.hasConflict = true;
-                                    setState(() {});
-                                    await showDialog(
-                                      context: context,
-                                      builder: (alertDialogContext) {
-                                        return WebViewAware(
-                                          child: AlertDialog(
+                                    if ((widget!.scheduleToEdit == null) ||
+                                        ((widget!.scheduleToEdit != null) &&
+                                            (_model
+                                                    .possibleConflictsSchedules?[
+                                                        _model.iterator]
+                                                    ?.reference
+                                                    .id !=
+                                                widget!.scheduleToEdit
+                                                    ?.reference.id) &&
+                                            !_model
+                                                .possibleConflictsSchedules![
+                                                    _model.iterator]
+                                                .done)) {
+                                      _model.hasConflict = true;
+                                      setState(() {});
+                                      await showDialog(
+                                        context: context,
+                                        builder: (alertDialogContext) {
+                                          return AlertDialog(
                                             title: Text('Invalid'),
                                             content: Text(
                                                 'There\'s seems to be another schedule that is conflicting with this schedule!'),
@@ -772,11 +921,11 @@ class _ScheduleEditDialogWidgetState extends State<ScheduleEditDialogWidget> {
                                                 child: Text('Ok'),
                                               ),
                                             ],
-                                          ),
-                                        );
-                                      },
-                                    );
-                                    break;
+                                          );
+                                        },
+                                      );
+                                      break;
+                                    }
                                   }
                                   _model.iterator = _model.iterator + 1;
                                   setState(() {});
@@ -785,9 +934,9 @@ class _ScheduleEditDialogWidgetState extends State<ScheduleEditDialogWidget> {
                                   if (_shouldSetState) setState(() {});
                                   return;
                                 }
-                                if (widget.schedule != null) {
+                                if (widget!.scheduleToEdit != null) {
                                   firestoreBatch.update(
-                                      widget.schedule!.reference,
+                                      widget!.scheduleToEdit!.reference,
                                       createSchedulesRecordData(
                                         teacher: currentUserReference,
                                         startTime: _model.selectedStart,
@@ -796,10 +945,15 @@ class _ScheduleEditDialogWidgetState extends State<ScheduleEditDialogWidget> {
                                         subject: _model.subjectValue,
                                         maxStudent: _model.maxStudentValue,
                                         totalDays: _model.totalDaysValue,
+                                        topics: _model.topicTextController.text,
+                                        price: double.tryParse(
+                                            _model.priceTextController.text),
                                       ));
                                 } else {
+                                  var schedulesRecordReference =
+                                      SchedulesRecord.collection.doc();
                                   firestoreBatch.set(
-                                      SchedulesRecord.collection.doc(),
+                                      schedulesRecordReference,
                                       createSchedulesRecordData(
                                         teacher: currentUserReference,
                                         startTime: _model.selectedStart,
@@ -808,7 +962,100 @@ class _ScheduleEditDialogWidgetState extends State<ScheduleEditDialogWidget> {
                                         subject: _model.subjectValue,
                                         maxStudent: _model.maxStudentValue,
                                         totalDays: _model.totalDaysValue,
+                                        topics: _model.topicTextController.text,
+                                        price: double.tryParse(
+                                            _model.priceTextController.text),
+                                        done: false,
                                       ));
+                                  _model.createdSchedule =
+                                      SchedulesRecord.getDocumentFromData(
+                                          createSchedulesRecordData(
+                                            teacher: currentUserReference,
+                                            startTime: _model.selectedStart,
+                                            endTime: _model.selectedEnd,
+                                            day: _model.dayValue,
+                                            subject: _model.subjectValue,
+                                            maxStudent: _model.maxStudentValue,
+                                            totalDays: _model.totalDaysValue,
+                                            topics:
+                                                _model.topicTextController.text,
+                                            price: double.tryParse(_model
+                                                .priceTextController.text),
+                                            done: false,
+                                          ),
+                                          schedulesRecordReference);
+                                  _shouldSetState = true;
+
+                                  var sessionsRecordReference =
+                                      SessionsRecord.collection.doc();
+                                  firestoreBatch.set(
+                                      sessionsRecordReference,
+                                      createSessionsRecordData(
+                                        teacher: currentUserReference,
+                                        daysRemaining: _model.totalDaysValue,
+                                        schedule:
+                                            _model.createdSchedule?.reference,
+                                        status: FFAppConstants.statusOngoing,
+                                        videoCallStatus: false,
+                                      ));
+                                  _model.createdSession =
+                                      SessionsRecord.getDocumentFromData(
+                                          createSessionsRecordData(
+                                            teacher: currentUserReference,
+                                            daysRemaining:
+                                                _model.totalDaysValue,
+                                            schedule: _model
+                                                .createdSchedule?.reference,
+                                            status:
+                                                FFAppConstants.statusOngoing,
+                                            videoCallStatus: false,
+                                          ),
+                                          sessionsRecordReference);
+                                  _shouldSetState = true;
+
+                                  var chatsRecordReference =
+                                      ChatsRecord.collection.doc();
+                                  firestoreBatch.set(chatsRecordReference, {
+                                    ...createChatsRecordData(
+                                      userA: currentUserReference,
+                                      groupChatId: _model.createdSession!
+                                          .reference.id.hashCode,
+                                      chatSession:
+                                          _model.createdSession?.reference,
+                                      lastMessage: 'Welcome students',
+                                      lastMessageSentBy: currentUserReference,
+                                    ),
+                                    ...mapToFirestore(
+                                      {
+                                        'last_message_time':
+                                            FieldValue.serverTimestamp(),
+                                        'last_message_seen_by': [
+                                          currentUserReference
+                                        ],
+                                      },
+                                    ),
+                                  });
+                                  _model.createdChatRef =
+                                      ChatsRecord.getDocumentFromData({
+                                    ...createChatsRecordData(
+                                      userA: currentUserReference,
+                                      groupChatId: _model.createdSession!
+                                          .reference.id.hashCode,
+                                      chatSession:
+                                          _model.createdSession?.reference,
+                                      lastMessage: 'Welcome students',
+                                      lastMessageSentBy: currentUserReference,
+                                    ),
+                                    ...mapToFirestore(
+                                      {
+                                        'last_message_time': DateTime.now(),
+                                        'last_message_seen_by': [
+                                          currentUserReference
+                                        ],
+                                      },
+                                    ),
+                                  }, chatsRecordReference);
+                                  _shouldSetState = true;
                                 }
 
                                 Navigator.pop(context);

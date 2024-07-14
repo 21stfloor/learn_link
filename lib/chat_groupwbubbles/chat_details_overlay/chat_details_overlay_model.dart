@@ -1,3 +1,4 @@
+import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/chat_groupwbubbles/delete_dialog/delete_dialog_widget.dart';
 import '/chat_groupwbubbles/user_list_small/user_list_small_widget.dart';
@@ -7,6 +8,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'dart:ui';
 import 'chat_details_overlay_widget.dart' show ChatDetailsOverlayWidget;
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -17,24 +19,22 @@ class ChatDetailsOverlayModel
     extends FlutterFlowModel<ChatDetailsOverlayWidget> {
   ///  State fields for stateful widgets in this component.
 
-  // Model for user_ListSmall component.
-  late UserListSmallModel userListSmallModel1;
+  // State field(s) for iuser widget.
+  bool iuserHovered = false;
   // Models for user_ListSmall dynamic component.
-  late FlutterFlowDynamicModels<UserListSmallModel> userListSmallModels2;
+  late FlutterFlowDynamicModels<UserListSmallModel> userListSmallModels;
   // Model for deleteDialog component.
   late DeleteDialogModel deleteDialogModel;
 
   @override
   void initState(BuildContext context) {
-    userListSmallModel1 = createModel(context, () => UserListSmallModel());
-    userListSmallModels2 = FlutterFlowDynamicModels(() => UserListSmallModel());
+    userListSmallModels = FlutterFlowDynamicModels(() => UserListSmallModel());
     deleteDialogModel = createModel(context, () => DeleteDialogModel());
   }
 
   @override
   void dispose() {
-    userListSmallModel1.dispose();
-    userListSmallModels2.dispose();
+    userListSmallModels.dispose();
     deleteDialogModel.dispose();
   }
 }

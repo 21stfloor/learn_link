@@ -18,10 +18,12 @@ class QuestionViewWidget extends StatefulWidget {
     super.key,
     required this.question,
     required this.enableNext,
+    required this.selectedAction,
   });
 
   final QuestionRecord? question;
   final Future Function()? enableNext;
+  final Future Function(String? selectedAnswer)? selectedAction;
 
   @override
   State<QuestionViewWidget> createState() => _QuestionViewWidgetState();
@@ -94,7 +96,7 @@ class _QuestionViewWidgetState extends State<QuestionViewWidget>
             padding: EdgeInsetsDirectional.fromSTEB(16.0, 50.0, 0.0, 0.0),
             child: Text(
               valueOrDefault<String>(
-                widget.question?.question,
+                widget!.question?.question,
                 '?',
               ),
               style: FlutterFlowTheme.of(context).displaySmall.override(
@@ -120,8 +122,13 @@ class _QuestionViewWidgetState extends State<QuestionViewWidget>
                   children: [
                     Expanded(
                       child: FlutterFlowRadioButton(
-                        options: widget.question!.options.toList(),
-                        onChanged: (val) => setState(() {}),
+                        options: widget!.question!.options.toList(),
+                        onChanged: (val) async {
+                          setState(() {});
+                          await widget.selectedAction?.call(
+                            _model.radioButtonValue,
+                          );
+                        },
                         controller: _model.radioButtonValueController ??=
                             FormFieldController<String>(null),
                         optionHeight: 36.0,

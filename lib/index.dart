@@ -50,3 +50,17 @@ export '/student/student_in_session/student_in_session_widget.dart'
     show StudentInSessionWidget;
 export '/teacher/teacher_in_session/teacher_in_session_widget.dart'
     show TeacherInSessionWidget;
+export '/student/student_skill_rating/student_skill_rating_widget.dart'
+    show StudentSkillRatingWidget;
+export '/teacher/teacher_attendance_page/teacher_attendance_page_widget.dart'
+    show TeacherAttendancePageWidget;
+export '/student/student_attendance_page/student_attendance_page_widget.dart'
+    show StudentAttendancePageWidget;
+export '/admin/admin_subscriptions/admin_subscriptions_widget.dart'
+    show AdminSubscriptionsWidget;
+export '/admin/admin_payment_history/admin_payment_history_widget.dart'
+    show AdminPaymentHistoryWidget;
+export '/admin/admin_settings_page/admin_settings_page_widget.dart'
+    show AdminSettingsPageWidget;
+export '/teacher/teacher_refund_page/teacher_refund_page_widget.dart'
+    show TeacherRefundPageWidget;

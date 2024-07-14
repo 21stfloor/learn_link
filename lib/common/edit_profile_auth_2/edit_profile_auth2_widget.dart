@@ -13,7 +13,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 import 'edit_profile_auth2_model.dart';
 export 'edit_profile_auth2_model.dart';
 
@@ -77,7 +76,7 @@ class _EditProfileAuth2WidgetState extends State<EditProfileAuth2Widget> {
             Padding(
               padding: EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 0.0, 0.0),
               child: Text(
-                '${widget.role} Profile',
+                '${widget!.role} Profile',
                 style: FlutterFlowTheme.of(context).displaySmall.override(
                       fontFamily: 'Inter',
                       letterSpacing: 0.0,
@@ -478,18 +477,16 @@ class _EditProfileAuth2WidgetState extends State<EditProfileAuth2Widget> {
                         await showDialog(
                           context: context,
                           builder: (alertDialogContext) {
-                            return WebViewAware(
-                              child: AlertDialog(
-                                title: Text('Invalid'),
-                                content: Text('Please upload a valid picture'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(alertDialogContext),
-                                    child: Text('Ok'),
-                                  ),
-                                ],
-                              ),
+                            return AlertDialog(
+                              title: Text('Invalid'),
+                              content: Text('Please upload a valid picture'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(alertDialogContext),
+                                  child: Text('Ok'),
+                                ),
+                              ],
                             );
                           },
                         );
@@ -499,18 +496,16 @@ class _EditProfileAuth2WidgetState extends State<EditProfileAuth2Widget> {
                         await showDialog(
                           context: context,
                           builder: (alertDialogContext) {
-                            return WebViewAware(
-                              child: AlertDialog(
-                                title: Text('Invalid'),
-                                content: Text('Please select a valid gender'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(alertDialogContext),
-                                    child: Text('Ok'),
-                                  ),
-                                ],
-                              ),
+                            return AlertDialog(
+                              title: Text('Invalid'),
+                              content: Text('Please select a valid gender'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(alertDialogContext),
+                                  child: Text('Ok'),
+                                ),
+                              ],
                             );
                           },
                         );
@@ -520,18 +515,16 @@ class _EditProfileAuth2WidgetState extends State<EditProfileAuth2Widget> {
                         await showDialog(
                           context: context,
                           builder: (alertDialogContext) {
-                            return WebViewAware(
-                              child: AlertDialog(
-                                title: Text('Invalid'),
-                                content: Text('Please select a valid birthday'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(alertDialogContext),
-                                    child: Text('Ok'),
-                                  ),
-                                ],
-                              ),
+                            return AlertDialog(
+                              title: Text('Invalid'),
+                              content: Text('Please select a valid birthday'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(alertDialogContext),
+                                  child: Text('Ok'),
+                                ),
+                              ],
                             );
                           },
                         );
@@ -555,7 +548,7 @@ class _EditProfileAuth2WidgetState extends State<EditProfileAuth2Widget> {
                             birthday: _model.selectedBirthday,
                             active: false,
                           ));
-                      if (widget.role == FFAppConstants.userTypeStudent) {
+                      if (widget!.role == FFAppConstants.userTypeStudent) {
                         firestoreBatch.set(
                             StudentProfileRecord.createDoc(
                                 currentUserReference!),
@@ -592,7 +585,7 @@ class _EditProfileAuth2WidgetState extends State<EditProfileAuth2Widget> {
                       await firestoreBatch.commit();
                     }
                   },
-                  text: widget.confirmButtonText,
+                  text: widget!.confirmButtonText,
                   options: FFButtonOptions(
                     width: double.infinity,
                     height: 44.0,

@@ -179,12 +179,12 @@ class _DeleteDialogWidgetState extends State<DeleteDialogWidget>
                     setState(() => _model.mouseRegionHovered1 = false);
                   }),
                 ),
-                if (widget.chatList?.userA == currentUserReference)
+                if (widget!.chatList?.userA == currentUserReference)
                   Divider(
                     thickness: 1.0,
                     color: FlutterFlowTheme.of(context).alternate,
                   ),
-                if (widget.chatList?.userA == currentUserReference)
+                if (widget!.chatList?.userA == currentUserReference)
                   MouseRegion(
                     opaque: false,
                     cursor: MouseCursor.defer ?? MouseCursor.defer,

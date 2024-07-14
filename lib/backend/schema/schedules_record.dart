@@ -61,6 +61,16 @@ class SchedulesRecord extends FirestoreRecord {
   DocumentReference? get prerequisite => _prerequisite;
   bool hasPrerequisite() => _prerequisite != null;
 
+  // "price" field.
+  double? _price;
+  double get price => _price ?? 0.0;
+  bool hasPrice() => _price != null;
+
+  // "done" field.
+  bool? _done;
+  bool get done => _done ?? false;
+  bool hasDone() => _done != null;
+
   void _initializeFields() {
     _teacher = snapshotData['teacher'] as DocumentReference?;
     _startTime = snapshotData['startTime'] as DateTime?;
@@ -71,6 +81,8 @@ class SchedulesRecord extends FirestoreRecord {
     _totalDays = castToType<int>(snapshotData['totalDays']);
     _topics = snapshotData['topics'] as String?;
     _prerequisite = snapshotData['prerequisite'] as DocumentReference?;
+    _price = castToType<double>(snapshotData['price']);
+    _done = snapshotData['done'] as bool?;
   }
 
   static CollectionReference get collection =>
@@ -117,6 +129,8 @@ Map<String, dynamic> createSchedulesRecordData({
   int? totalDays,
   String? topics,
   DocumentReference? prerequisite,
+  double? price,
+  bool? done,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -129,6 +143,8 @@ Map<String, dynamic> createSchedulesRecordData({
       'totalDays': totalDays,
       'topics': topics,
       'prerequisite': prerequisite,
+      'price': price,
+      'done': done,
     }.withoutNulls,
   );
 
@@ -148,7 +164,9 @@ class SchedulesRecordDocumentEquality implements Equality<SchedulesRecord> {
         e1?.maxStudent == e2?.maxStudent &&
         e1?.totalDays == e2?.totalDays &&
         e1?.topics == e2?.topics &&
-        e1?.prerequisite == e2?.prerequisite;
+        e1?.prerequisite == e2?.prerequisite &&
+        e1?.price == e2?.price &&
+        e1?.done == e2?.done;
   }
 
   @override
@@ -161,7 +179,9 @@ class SchedulesRecordDocumentEquality implements Equality<SchedulesRecord> {
         e?.maxStudent,
         e?.totalDays,
         e?.topics,
-        e?.prerequisite
+        e?.prerequisite,
+        e?.price,
+        e?.done
       ]);
 
   @override

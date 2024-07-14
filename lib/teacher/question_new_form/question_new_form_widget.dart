@@ -8,7 +8,6 @@ import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 import 'question_new_form_model.dart';
 export 'question_new_form_model.dart';
 
@@ -158,6 +157,7 @@ class _QuestionNewFormWidgetState extends State<QuestionNewFormWidget> {
                   Builder(
                     builder: (context) {
                       final optionsRows = _model.options.toList();
+
                       return ListView.builder(
                         padding: EdgeInsets.zero,
                         shrinkWrap: true,
@@ -300,19 +300,17 @@ class _QuestionNewFormWidgetState extends State<QuestionNewFormWidget> {
                           await showDialog(
                             context: context,
                             builder: (alertDialogContext) {
-                              return WebViewAware(
-                                child: AlertDialog(
-                                  title: Text('Invalid'),
-                                  content:
-                                      Text('Please add at least two options'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(alertDialogContext),
-                                      child: Text('Ok'),
-                                    ),
-                                  ],
-                                ),
+                              return AlertDialog(
+                                title: Text('Invalid'),
+                                content:
+                                    Text('Please add at least two options'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(alertDialogContext),
+                                    child: Text('Ok'),
+                                  ),
+                                ],
                               );
                             },
                           );
@@ -322,19 +320,16 @@ class _QuestionNewFormWidgetState extends State<QuestionNewFormWidget> {
                           await showDialog(
                             context: context,
                             builder: (alertDialogContext) {
-                              return WebViewAware(
-                                child: AlertDialog(
-                                  title: Text('Invalid'),
-                                  content:
-                                      Text('Blank options are not allowed!'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(alertDialogContext),
-                                      child: Text('Ok'),
-                                    ),
-                                  ],
-                                ),
+                              return AlertDialog(
+                                title: Text('Invalid'),
+                                content: Text('Blank options are not allowed!'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(alertDialogContext),
+                                    child: Text('Ok'),
+                                  ),
+                                ],
                               );
                             },
                           );
@@ -355,19 +350,17 @@ class _QuestionNewFormWidgetState extends State<QuestionNewFormWidget> {
                           await showDialog(
                             context: context,
                             builder: (alertDialogContext) {
-                              return WebViewAware(
-                                child: AlertDialog(
-                                  title: Text('Invalid'),
-                                  content: Text(
-                                      'The correct answer should be in the options!'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(alertDialogContext),
-                                      child: Text('Ok'),
-                                    ),
-                                  ],
-                                ),
+                              return AlertDialog(
+                                title: Text('Invalid'),
+                                content: Text(
+                                    'The correct answer should be in the options!'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(alertDialogContext),
+                                    child: Text('Ok'),
+                                  ),
+                                ],
                               );
                             },
                           );
@@ -401,23 +394,21 @@ class _QuestionNewFormWidgetState extends State<QuestionNewFormWidget> {
                         var confirmDialogResponse = await showDialog<bool>(
                               context: context,
                               builder: (alertDialogContext) {
-                                return WebViewAware(
-                                  child: AlertDialog(
-                                    title: Text('Confirm'),
-                                    content: Text('Discard changes?'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(
-                                            alertDialogContext, false),
-                                        child: Text('Cancel'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(
-                                            alertDialogContext, true),
-                                        child: Text('Confirm'),
-                                      ),
-                                    ],
-                                  ),
+                                return AlertDialog(
+                                  title: Text('Confirm'),
+                                  content: Text('Discard changes?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(
+                                          alertDialogContext, false),
+                                      child: Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(
+                                          alertDialogContext, true),
+                                      child: Text('Confirm'),
+                                    ),
+                                  ],
                                 );
                               },
                             ) ??

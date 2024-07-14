@@ -79,19 +79,15 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
       initialLocation: '/',
       debugLogDiagnostics: true,
       refreshListenable: appStateNotifier,
-      errorBuilder: (context, state) => RootPageContext.wrap(
+      errorBuilder: (context, state) =>
           appStateNotifier.loggedIn ? RedirectionWidget() : Auth2LoginWidget(),
-        errorRoute: state.uri.toString(),
-      ),
       routes: [
         FFRoute(
           name: '_initialize',
           path: '/',
-          builder: (context, _) => RootPageContext.wrap(
-            appStateNotifier.loggedIn
+          builder: (context, _) => appStateNotifier.loggedIn
               ? RedirectionWidget()
               : Auth2LoginWidget(),
-        ),
         ),
         FFRoute(
           name: 'auth_2_CreateAccount',
@@ -197,10 +193,21 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           requireAuth: true,
           asyncParams: {
             'quiz': getDoc(['quiz'], QuizRecord.fromSnapshot),
+            'quizTaker': getDoc(
+                ['QuizSession', 'QuizTaker'], QuizTakerRecord.fromSnapshot),
+            'session': getDoc(['sessions'], SessionsRecord.fromSnapshot),
           },
           builder: (context, params) => QuizTakeFormWidget(
             quiz: params.getParam(
               'quiz',
+              ParamType.Document,
+            ),
+            quizTaker: params.getParam(
+              'quizTaker',
+              ParamType.Document,
+            ),
+            session: params.getParam(
+              'session',
               ParamType.Document,
             ),
           ),
@@ -281,12 +288,23 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'studentInSession',
           path: '/studentInSession',
           requireAuth: true,
+          asyncParams: {
+            'chatDoc': getDoc(['chats'], ChatsRecord.fromSnapshot),
+            'schedule': getDoc(['schedules'], SchedulesRecord.fromSnapshot),
+            'session': getDoc(['sessions'], SessionsRecord.fromSnapshot),
+          },
           builder: (context, params) => StudentInSessionWidget(
-            chatRef: params.getParam(
-              'chatRef',
-              ParamType.DocumentReference,
-              isList: false,
-              collectionNamePath: ['chats'],
+            chatDoc: params.getParam(
+              'chatDoc',
+              ParamType.Document,
+            ),
+            schedule: params.getParam(
+              'schedule',
+              ParamType.Document,
+            ),
+            session: params.getParam(
+              'session',
+              ParamType.Document,
             ),
           ),
         ),
@@ -303,6 +321,48 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
               ParamType.Document,
             ),
           ),
+        ),
+        FFRoute(
+          name: 'student_skill_rating',
+          path: '/studentSkillRating',
+          requireAuth: true,
+          builder: (context, params) => StudentSkillRatingWidget(),
+        ),
+        FFRoute(
+          name: 'teacherAttendancePage',
+          path: '/teacherAttendancePage',
+          requireAuth: true,
+          builder: (context, params) => TeacherAttendancePageWidget(),
+        ),
+        FFRoute(
+          name: 'studentAttendancePage',
+          path: '/studentAttendancePage',
+          requireAuth: true,
+          builder: (context, params) => StudentAttendancePageWidget(),
+        ),
+        FFRoute(
+          name: 'adminSubscriptions',
+          path: '/adminSubscriptions',
+          requireAuth: true,
+          builder: (context, params) => AdminSubscriptionsWidget(),
+        ),
+        FFRoute(
+          name: 'adminPaymentHistory',
+          path: '/adminPaymentHistory',
+          requireAuth: true,
+          builder: (context, params) => AdminPaymentHistoryWidget(),
+        ),
+        FFRoute(
+          name: 'adminSettingsPage',
+          path: '/adminSettingsPage',
+          requireAuth: true,
+          builder: (context, params) => AdminSettingsPageWidget(),
+        ),
+        FFRoute(
+          name: 'teacherRefundPage',
+          path: '/teacherRefundPage',
+          requireAuth: true,
+          builder: (context, params) => TeacherRefundPageWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
       observers: [routeObserver],
@@ -491,10 +551,14 @@ class FFRoute {
               : builder(context, ffParams);
           final child = appStateNotifier.loading
               ? Container(
-                  color: Colors.transparent,
-                  child: Image.asset(
-                    'assets/images/449502482_1493667721236596_6565879501599912661_n.png',
-                    fit: BoxFit.contain,
+                  color: FlutterFlowTheme.of(context).primaryBackground,
+                  child: Center(
+                    child: Image.asset(
+                      'assets/images/449502482_1493667721236596_6565879501599912661_n.png',
+                      width: 128.0,
+                      height: 128.0,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 )
               : page;

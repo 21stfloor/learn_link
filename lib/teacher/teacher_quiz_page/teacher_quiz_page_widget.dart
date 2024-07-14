@@ -1,6 +1,7 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/common/drawer_toggle/drawer_toggle_widget.dart';
+import '/components/subscription_payment_select_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
@@ -11,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 import 'teacher_quiz_page_model.dart';
 export 'teacher_quiz_page_model.dart';
 
@@ -55,6 +55,8 @@ class _TeacherQuizPageWidgetState extends State<TeacherQuizPageWidget> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<FFAppState>();
+
     return GestureDetector(
       onTap: () => _model.unfocusNode.canRequestFocus
           ? FocusScope.of(context).requestFocus(_model.unfocusNode)
@@ -64,12 +66,10 @@ class _TeacherQuizPageWidgetState extends State<TeacherQuizPageWidget> {
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
         drawer: Drawer(
           elevation: 16.0,
-          child: WebViewAware(
-            child: wrapWithModel(
-              model: _model.teacherSidebarModel,
-              updateCallback: () => setState(() {}),
-              child: TeacherSidebarWidget(),
-            ),
+          child: wrapWithModel(
+            model: _model.teacherSidebarModel,
+            updateCallback: () => setState(() {}),
+            child: TeacherSidebarWidget(),
           ),
         ),
         body: SafeArea(
@@ -135,36 +135,119 @@ class _TeacherQuizPageWidgetState extends State<TeacherQuizPageWidget> {
                                       letterSpacing: 0.0,
                                     ),
                               ),
-                              FFButtonWidget(
-                                onPressed: () async {
-                                  context.pushNamed('QuizCreateForm');
-                                },
-                                text: 'New quiz',
-                                icon: Icon(
-                                  Icons.add,
-                                  size: 15.0,
-                                ),
-                                options: FFButtonOptions(
-                                  height: 40.0,
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      24.0, 0.0, 24.0, 0.0),
-                                  iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0, 0.0, 0.0, 0.0),
-                                  color: FlutterFlowTheme.of(context).primary,
-                                  textStyle: FlutterFlowTheme.of(context)
-                                      .titleSmall
-                                      .override(
-                                        fontFamily: 'Readex Pro',
-                                        color: Colors.white,
-                                        letterSpacing: 0.0,
+                              Builder(
+                                builder: (context) {
+                                  if (FFAppState().subscribed) {
+                                    return FFButtonWidget(
+                                      onPressed: () async {
+                                        context.pushNamed('QuizCreateForm');
+                                      },
+                                      text: 'New quiz',
+                                      icon: Icon(
+                                        Icons.add,
+                                        size: 15.0,
                                       ),
-                                  elevation: 3.0,
-                                  borderSide: BorderSide(
-                                    color: Colors.transparent,
-                                    width: 1.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
+                                      options: FFButtonOptions(
+                                        height: 40.0,
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            24.0, 0.0, 24.0, 0.0),
+                                        iconPadding:
+                                            EdgeInsetsDirectional.fromSTEB(
+                                                0.0, 0.0, 0.0, 0.0),
+                                        color: FlutterFlowTheme.of(context)
+                                            .primary,
+                                        textStyle: FlutterFlowTheme.of(context)
+                                            .titleSmall
+                                            .override(
+                                              fontFamily: 'Readex Pro',
+                                              color: Colors.white,
+                                              letterSpacing: 0.0,
+                                            ),
+                                        elevation: 3.0,
+                                        borderSide: BorderSide(
+                                          color: Colors.transparent,
+                                          width: 1.0,
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                    );
+                                  } else {
+                                    return Builder(
+                                      builder: (context) => FFButtonWidget(
+                                        onPressed: () async {
+                                          await showDialog(
+                                            context: context,
+                                            builder: (dialogContext) {
+                                              return Dialog(
+                                                elevation: 0,
+                                                insetPadding: EdgeInsets.zero,
+                                                backgroundColor:
+                                                    Colors.transparent,
+                                                alignment: AlignmentDirectional(
+                                                        0.0, 0.0)
+                                                    .resolve(Directionality.of(
+                                                        context)),
+                                                child: GestureDetector(
+                                                  onTap: () => _model
+                                                          .unfocusNode
+                                                          .canRequestFocus
+                                                      ? FocusScope.of(context)
+                                                          .requestFocus(_model
+                                                              .unfocusNode)
+                                                      : FocusScope.of(context)
+                                                          .unfocus(),
+                                                  child:
+                                                      SubscriptionPaymentSelectWidget(
+                                                    role: valueOrDefault(
+                                                        currentUserDocument
+                                                            ?.role,
+                                                        ''),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ).then((value) => setState(() {}));
+                                        },
+                                        text: 'Subscribe to unlock',
+                                        icon: Icon(
+                                          Icons.stars_sharp,
+                                          size: 15.0,
+                                        ),
+                                        options: FFButtonOptions(
+                                          width: 200.0,
+                                          height: 40.0,
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0.0, 0.0, 0.0, 0.0),
+                                          iconPadding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0.0, 0.0, 0.0, 0.0),
+                                          color: FlutterFlowTheme.of(context)
+                                              .accent3,
+                                          textStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .titleSmall
+                                                  .override(
+                                                    fontFamily:
+                                                        'Plus Jakarta Sans',
+                                                    color: Color(0xFF14181B),
+                                                    fontSize: 16.0,
+                                                    letterSpacing: 0.0,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                          elevation: 0.0,
+                                          borderSide: BorderSide(
+                                            color: Color(0xFF4B39EF),
+                                            width: 2.0,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(12.0),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
                               ),
                             ],
                           ),
@@ -340,6 +423,7 @@ class _TeacherQuizPageWidgetState extends State<TeacherQuizPageWidget> {
                                                   List<QuizRecord>
                                                       listViewQuizRecordList =
                                                       snapshot.data!;
+
                                                   return ListView.builder(
                                                     padding: EdgeInsets.zero,
                                                     shrinkWrap: true,
@@ -468,183 +552,208 @@ class _TeacherQuizPageWidgetState extends State<TeacherQuizPageWidget> {
                                                                         ),
                                                                   ),
                                                                 ),
-                                                                SingleChildScrollView(
-                                                                  scrollDirection:
-                                                                      Axis.horizontal,
-                                                                  child: Row(
-                                                                    mainAxisSize:
-                                                                        MainAxisSize
-                                                                            .min,
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      FFButtonWidget(
-                                                                        onPressed:
-                                                                            () async {
-                                                                          context
-                                                                              .pushNamed(
-                                                                            'QuizEditForm',
-                                                                            queryParameters:
-                                                                                {
-                                                                              'quizToEdit': serializeParam(
-                                                                                listViewQuizRecord,
-                                                                                ParamType.Document,
+                                                                Builder(
+                                                                  builder:
+                                                                      (context) {
+                                                                    if (FFAppState()
+                                                                        .subscribed) {
+                                                                      return SingleChildScrollView(
+                                                                        scrollDirection:
+                                                                            Axis.horizontal,
+                                                                        child:
+                                                                            Row(
+                                                                          mainAxisSize:
+                                                                              MainAxisSize.min,
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.center,
+                                                                          children: [
+                                                                            FFButtonWidget(
+                                                                              onPressed: () async {
+                                                                                context.pushNamed(
+                                                                                  'QuizEditForm',
+                                                                                  queryParameters: {
+                                                                                    'quizToEdit': serializeParam(
+                                                                                      listViewQuizRecord,
+                                                                                      ParamType.Document,
+                                                                                    ),
+                                                                                  }.withoutNulls,
+                                                                                  extra: <String, dynamic>{
+                                                                                    'quizToEdit': listViewQuizRecord,
+                                                                                  },
+                                                                                );
+                                                                              },
+                                                                              text: 'Edit',
+                                                                              icon: Icon(
+                                                                                Icons.edit,
+                                                                                size: 15.0,
                                                                               ),
-                                                                            }.withoutNulls,
-                                                                            extra: <String,
-                                                                                dynamic>{
-                                                                              'quizToEdit': listViewQuizRecord,
-                                                                            },
-                                                                          );
-                                                                        },
-                                                                        text:
-                                                                            'Edit',
-                                                                        icon:
-                                                                            Icon(
-                                                                          Icons
-                                                                              .edit,
-                                                                          size:
-                                                                              15.0,
-                                                                        ),
-                                                                        options:
-                                                                            FFButtonOptions(
-                                                                          height:
-                                                                              40.0,
-                                                                          padding: EdgeInsetsDirectional.fromSTEB(
-                                                                              24.0,
-                                                                              0.0,
-                                                                              24.0,
-                                                                              0.0),
-                                                                          iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                                                              0.0,
-                                                                              0.0,
-                                                                              0.0,
-                                                                              0.0),
-                                                                          color:
-                                                                              FlutterFlowTheme.of(context).secondary,
-                                                                          textStyle: FlutterFlowTheme.of(context)
-                                                                              .titleSmall
-                                                                              .override(
-                                                                                fontFamily: 'Readex Pro',
-                                                                                color: Colors.white,
-                                                                                letterSpacing: 0.0,
+                                                                              options: FFButtonOptions(
+                                                                                height: 40.0,
+                                                                                padding: EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
+                                                                                iconPadding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                                                                                color: FlutterFlowTheme.of(context).secondary,
+                                                                                textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                                                                                      fontFamily: 'Readex Pro',
+                                                                                      color: Colors.white,
+                                                                                      letterSpacing: 0.0,
+                                                                                    ),
+                                                                                elevation: 3.0,
+                                                                                borderSide: BorderSide(
+                                                                                  color: Colors.transparent,
+                                                                                  width: 1.0,
+                                                                                ),
+                                                                                borderRadius: BorderRadius.circular(8.0),
                                                                               ),
-                                                                          elevation:
-                                                                              3.0,
-                                                                          borderSide:
-                                                                              BorderSide(
-                                                                            color:
-                                                                                Colors.transparent,
-                                                                            width:
-                                                                                1.0,
-                                                                          ),
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(8.0),
-                                                                        ),
-                                                                      ),
-                                                                      FFButtonWidget(
-                                                                        onPressed:
-                                                                            () async {
-                                                                          final firestoreBatch = FirebaseFirestore
-                                                                              .instance
-                                                                              .batch();
-                                                                          try {
-                                                                            var confirmDialogResponse = await showDialog<bool>(
-                                                                                  context: context,
-                                                                                  builder: (alertDialogContext) {
-                                                                                    return WebViewAware(
-                                                                                      child: AlertDialog(
-                                                                                        title: Text('Confirm'),
-                                                                                        content: Text('Are you sure you want to delete this quiz?'),
-                                                                                        actions: [
-                                                                                          TextButton(
-                                                                                            onPressed: () => Navigator.pop(alertDialogContext, false),
-                                                                                            child: Text('Cancel'),
+                                                                            ),
+                                                                            FFButtonWidget(
+                                                                              onPressed: () async {
+                                                                                final firestoreBatch = FirebaseFirestore.instance.batch();
+                                                                                try {
+                                                                                  var confirmDialogResponse = await showDialog<bool>(
+                                                                                        context: context,
+                                                                                        builder: (alertDialogContext) {
+                                                                                          return AlertDialog(
+                                                                                            title: Text('Confirm'),
+                                                                                            content: Text('Are you sure you want to delete this quiz?'),
+                                                                                            actions: [
+                                                                                              TextButton(
+                                                                                                onPressed: () => Navigator.pop(alertDialogContext, false),
+                                                                                                child: Text('Cancel'),
+                                                                                              ),
+                                                                                              TextButton(
+                                                                                                onPressed: () => Navigator.pop(alertDialogContext, true),
+                                                                                                child: Text('Confirm'),
+                                                                                              ),
+                                                                                            ],
+                                                                                          );
+                                                                                        },
+                                                                                      ) ??
+                                                                                      false;
+                                                                                  if (confirmDialogResponse) {
+                                                                                    _model.iterator = 0;
+                                                                                    setState(() {});
+                                                                                    while (_model.iterator < listViewQuizRecord.questions.length) {
+                                                                                      firestoreBatch.delete(listViewQuizRecord.questions[_model.iterator]);
+                                                                                      _model.iterator = _model.iterator + 1;
+                                                                                      setState(() {});
+                                                                                    }
+                                                                                    firestoreBatch.delete(listViewQuizRecord.reference);
+                                                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                                                      SnackBar(
+                                                                                        content: Text(
+                                                                                          'Quiz was deleted successfully',
+                                                                                          style: TextStyle(
+                                                                                            color: FlutterFlowTheme.of(context).primaryText,
                                                                                           ),
-                                                                                          TextButton(
-                                                                                            onPressed: () => Navigator.pop(alertDialogContext, true),
-                                                                                            child: Text('Confirm'),
-                                                                                          ),
-                                                                                        ],
+                                                                                        ),
+                                                                                        duration: Duration(milliseconds: 4000),
+                                                                                        backgroundColor: FlutterFlowTheme.of(context).secondary,
                                                                                       ),
                                                                                     );
-                                                                                  },
-                                                                                ) ??
-                                                                                false;
-                                                                            if (confirmDialogResponse) {
-                                                                              _model.iterator = 0;
-                                                                              setState(() {});
-                                                                              while (_model.iterator < listViewQuizRecord.questions.length) {
-                                                                                firestoreBatch.delete(listViewQuizRecord.questions[_model.iterator]);
-                                                                                _model.iterator = _model.iterator + 1;
-                                                                                setState(() {});
-                                                                              }
-                                                                              firestoreBatch.delete(listViewQuizRecord.reference);
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                SnackBar(
-                                                                                  content: Text(
-                                                                                    'Quiz was deleted successfully',
-                                                                                    style: TextStyle(
-                                                                                      color: FlutterFlowTheme.of(context).primaryText,
+                                                                                  }
+                                                                                } finally {
+                                                                                  await firestoreBatch.commit();
+                                                                                }
+                                                                              },
+                                                                              text: 'Delete',
+                                                                              icon: Icon(
+                                                                                Icons.delete_forever,
+                                                                                size: 15.0,
+                                                                              ),
+                                                                              options: FFButtonOptions(
+                                                                                height: 40.0,
+                                                                                padding: EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
+                                                                                iconPadding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                                                                                color: FlutterFlowTheme.of(context).error,
+                                                                                textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                                                                                      fontFamily: 'Readex Pro',
+                                                                                      color: Colors.white,
+                                                                                      letterSpacing: 0.0,
+                                                                                    ),
+                                                                                elevation: 3.0,
+                                                                                borderSide: BorderSide(
+                                                                                  color: Colors.transparent,
+                                                                                  width: 1.0,
+                                                                                ),
+                                                                                borderRadius: BorderRadius.circular(8.0),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      );
+                                                                    } else {
+                                                                      return Builder(
+                                                                        builder:
+                                                                            (context) =>
+                                                                                FFButtonWidget(
+                                                                          onPressed:
+                                                                              () async {
+                                                                            await showDialog(
+                                                                              context: context,
+                                                                              builder: (dialogContext) {
+                                                                                return Dialog(
+                                                                                  elevation: 0,
+                                                                                  insetPadding: EdgeInsets.zero,
+                                                                                  backgroundColor: Colors.transparent,
+                                                                                  alignment: AlignmentDirectional(0.0, 0.0).resolve(Directionality.of(context)),
+                                                                                  child: GestureDetector(
+                                                                                    onTap: () => _model.unfocusNode.canRequestFocus ? FocusScope.of(context).requestFocus(_model.unfocusNode) : FocusScope.of(context).unfocus(),
+                                                                                    child: SubscriptionPaymentSelectWidget(
+                                                                                      role: valueOrDefault(currentUserDocument?.role, ''),
                                                                                     ),
                                                                                   ),
-                                                                                  duration: Duration(milliseconds: 4000),
-                                                                                  backgroundColor: FlutterFlowTheme.of(context).secondary,
-                                                                                ),
-                                                                              );
-                                                                            }
-                                                                          } finally {
-                                                                            await firestoreBatch.commit();
-                                                                          }
-                                                                        },
-                                                                        text:
-                                                                            'Delete',
-                                                                        icon:
-                                                                            Icon(
-                                                                          Icons
-                                                                              .delete_forever,
-                                                                          size:
-                                                                              15.0,
-                                                                        ),
-                                                                        options:
-                                                                            FFButtonOptions(
-                                                                          height:
-                                                                              40.0,
-                                                                          padding: EdgeInsetsDirectional.fromSTEB(
-                                                                              24.0,
-                                                                              0.0,
-                                                                              24.0,
-                                                                              0.0),
-                                                                          iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                                                              0.0,
-                                                                              0.0,
-                                                                              0.0,
-                                                                              0.0),
-                                                                          color:
-                                                                              FlutterFlowTheme.of(context).error,
-                                                                          textStyle: FlutterFlowTheme.of(context)
-                                                                              .titleSmall
-                                                                              .override(
-                                                                                fontFamily: 'Readex Pro',
-                                                                                color: Colors.white,
-                                                                                letterSpacing: 0.0,
-                                                                              ),
-                                                                          elevation:
-                                                                              3.0,
-                                                                          borderSide:
-                                                                              BorderSide(
-                                                                            color:
-                                                                                Colors.transparent,
-                                                                            width:
-                                                                                1.0,
+                                                                                );
+                                                                              },
+                                                                            ).then((value) =>
+                                                                                setState(() {}));
+                                                                          },
+                                                                          text:
+                                                                              'Subscribe to unlock',
+                                                                          icon:
+                                                                              Icon(
+                                                                            Icons.stars_sharp,
+                                                                            size:
+                                                                                15.0,
                                                                           ),
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(8.0),
+                                                                          options:
+                                                                              FFButtonOptions(
+                                                                            width:
+                                                                                200.0,
+                                                                            height:
+                                                                                40.0,
+                                                                            padding: EdgeInsetsDirectional.fromSTEB(
+                                                                                0.0,
+                                                                                0.0,
+                                                                                0.0,
+                                                                                0.0),
+                                                                            iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                                                                0.0,
+                                                                                0.0,
+                                                                                0.0,
+                                                                                0.0),
+                                                                            color:
+                                                                                FlutterFlowTheme.of(context).accent3,
+                                                                            textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                                                                                  fontFamily: 'Plus Jakarta Sans',
+                                                                                  color: Color(0xFF14181B),
+                                                                                  fontSize: 16.0,
+                                                                                  letterSpacing: 0.0,
+                                                                                  fontWeight: FontWeight.bold,
+                                                                                ),
+                                                                            elevation:
+                                                                                0.0,
+                                                                            borderSide:
+                                                                                BorderSide(
+                                                                              color: Color(0xFF4B39EF),
+                                                                              width: 2.0,
+                                                                            ),
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(12.0),
+                                                                          ),
                                                                         ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
+                                                                      );
+                                                                    }
+                                                                  },
                                                                 ),
                                                               ],
                                                             ),

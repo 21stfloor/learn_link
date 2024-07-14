@@ -41,10 +41,10 @@ class _Chat2InviteUsersWidgetState extends State<Chat2InviteUsersWidget> {
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      if (widget.chatRef != null) {
+      if (widget!.chatRef != null) {
         // addChatUsers_ToList
         _model.friendsList =
-            widget.chatRef!.users.toList().cast<DocumentReference>();
+            widget!.chatRef!.users.toList().cast<DocumentReference>();
         setState(() {});
       } else {
         // addUser_ToList
@@ -417,10 +417,10 @@ class _Chat2InviteUsersWidgetState extends State<Chat2InviteUsersWidget> {
                   child: FFButtonWidget(
                     onPressed: () async {
                       if (_model.friendsList.length >= 2) {
-                        if (widget.chatRef != null) {
+                        if (widget!.chatRef != null) {
                           // updateChat
 
-                          await widget.chatRef!.reference.update({
+                          await widget!.chatRef!.reference.update({
                             ...mapToFirestore(
                               {
                                 'users': _model.friendsList,
@@ -431,7 +431,7 @@ class _Chat2InviteUsersWidgetState extends State<Chat2InviteUsersWidget> {
                           _model.updatedChatThread = await queryChatsRecordOnce(
                             queryBuilder: (chatsRecord) => chatsRecord.where(
                               'group_chat_id',
-                              isEqualTo: widget.chatRef?.groupChatId,
+                              isEqualTo: widget!.chatRef?.groupChatId,
                             ),
                             singleRecord: true,
                           ).then((s) => s.firstOrNull);
@@ -526,8 +526,9 @@ class _Chat2InviteUsersWidgetState extends State<Chat2InviteUsersWidget> {
 
                       setState(() {});
                     },
-                    text:
-                        widget.chatRef != null ? 'Add to Chat' : 'Send Invites',
+                    text: widget!.chatRef != null
+                        ? 'Add to Chat'
+                        : 'Send Invites',
                     options: FFButtonOptions(
                       width: double.infinity,
                       height: 50.0,

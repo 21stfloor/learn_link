@@ -9,11 +9,13 @@ import '/flutter_flow/form_field_controller.dart';
 import '/flutter_flow/upload_data.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 import 'edit_profile_auth_teacher_model.dart';
 export 'edit_profile_auth_teacher_model.dart';
 
@@ -49,13 +51,27 @@ class _EditProfileAuthTeacherWidgetState
     super.initState();
     _model = createModel(context, () => EditProfileAuthTeacherModel());
 
-    _model.firstNameTextController ??= TextEditingController();
-    _model.firstNameFocusNode ??= FocusNode();
+    // On component load action.
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      _model.existingTeacherProfile = await queryTeacherProfileRecordOnce(
+        parent: currentUserReference,
+        singleRecord: true,
+      ).then((s) => s.firstOrNull);
+      if (_model.existingTeacherProfile != null) {
+        _model.selectedBirthday = currentUserDocument?.birthday;
+        _model.selectedPhoto = currentUserPhoto;
+        setState(() {});
+      }
+    });
 
-    _model.lastNameTextController ??= TextEditingController();
-    _model.lastNameFocusNode ??= FocusNode();
+    _model.fullNameTextController ??=
+        TextEditingController(text: currentUserDisplayName);
+    _model.fullNameFocusNode ??= FocusNode();
 
-    _model.bioTextController ??= TextEditingController();
+    _model.bioTextController ??= TextEditingController(
+        text: _model.existingTeacherProfile != null
+            ? _model.existingTeacherProfile?.bio
+            : '');
     _model.bioFocusNode ??= FocusNode();
 
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
@@ -82,7 +98,7 @@ class _EditProfileAuthTeacherWidgetState
             Padding(
               padding: EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 0.0, 0.0),
               child: Text(
-                '${widget.role} Profile',
+                '${widget!.role} Profile',
                 style: FlutterFlowTheme.of(context).displaySmall.override(
                       fontFamily: 'Inter',
                       letterSpacing: 0.0,
@@ -218,6 +234,24 @@ class _EditProfileAuthTeacherWidgetState
                         return;
                       }
                     }
+
+                    if (_model.uploadedFileUrl != null &&
+                        _model.uploadedFileUrl != '') {
+                      _model.selectedPhoto = _model.uploadedFileUrl;
+                      setState(() {});
+                    } else {
+                      _model.selectedPhoto = currentUserPhoto;
+                      setState(() {});
+                    }
+
+                    if ((_model.selectedPhoto != null &&
+                            _model.selectedPhoto != '') &&
+                        (_model.uploadedFileUrl != null &&
+                            _model.uploadedFileUrl != '')) {
+                      await FirebaseStorage.instance
+                          .refFromURL(_model.selectedPhoto!)
+                          .delete();
+                    }
                   },
                   text: 'Change Photo',
                   options: FFButtonOptions(
@@ -243,117 +277,61 @@ class _EditProfileAuthTeacherWidgetState
             ),
             Padding(
               padding: EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
-              child: Container(
-                width: double.infinity,
-                child: TextFormField(
-                  controller: _model.firstNameTextController,
-                  focusNode: _model.firstNameFocusNode,
-                  autofocus: true,
-                  autofillHints: [AutofillHints.email],
-                  obscureText: false,
-                  decoration: InputDecoration(
-                    labelText: 'First Name',
-                    labelStyle:
-                        FlutterFlowTheme.of(context).labelLarge.override(
-                              fontFamily: 'Readex Pro',
-                              letterSpacing: 0.0,
-                            ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: FlutterFlowTheme.of(context).alternate,
-                        width: 2.0,
+              child: AuthUserStreamWidget(
+                builder: (context) => Container(
+                  width: double.infinity,
+                  child: TextFormField(
+                    controller: _model.fullNameTextController,
+                    focusNode: _model.fullNameFocusNode,
+                    autofocus: true,
+                    autofillHints: [AutofillHints.email],
+                    obscureText: false,
+                    decoration: InputDecoration(
+                      labelText: 'Full Name',
+                      labelStyle:
+                          FlutterFlowTheme.of(context).labelLarge.override(
+                                fontFamily: 'Readex Pro',
+                                letterSpacing: 0.0,
+                              ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: FlutterFlowTheme.of(context).alternate,
+                          width: 2.0,
+                        ),
+                        borderRadius: BorderRadius.circular(12.0),
                       ),
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: FlutterFlowTheme.of(context).primary,
-                        width: 2.0,
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: FlutterFlowTheme.of(context).primary,
+                          width: 2.0,
+                        ),
+                        borderRadius: BorderRadius.circular(12.0),
                       ),
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: FlutterFlowTheme.of(context).error,
-                        width: 2.0,
+                      errorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: FlutterFlowTheme.of(context).error,
+                          width: 2.0,
+                        ),
+                        borderRadius: BorderRadius.circular(12.0),
                       ),
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    focusedErrorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: FlutterFlowTheme.of(context).error,
-                        width: 2.0,
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: FlutterFlowTheme.of(context).error,
+                          width: 2.0,
+                        ),
+                        borderRadius: BorderRadius.circular(12.0),
                       ),
-                      borderRadius: BorderRadius.circular(12.0),
+                      filled: true,
+                      fillColor: FlutterFlowTheme.of(context).primaryBackground,
                     ),
-                    filled: true,
-                    fillColor: FlutterFlowTheme.of(context).primaryBackground,
+                    style: FlutterFlowTheme.of(context).bodyLarge.override(
+                          fontFamily: 'Readex Pro',
+                          letterSpacing: 0.0,
+                        ),
+                    cursorColor: FlutterFlowTheme.of(context).primary,
+                    validator: _model.fullNameTextControllerValidator
+                        .asValidator(context),
                   ),
-                  style: FlutterFlowTheme.of(context).bodyLarge.override(
-                        fontFamily: 'Readex Pro',
-                        letterSpacing: 0.0,
-                      ),
-                  cursorColor: FlutterFlowTheme.of(context).primary,
-                  validator: _model.firstNameTextControllerValidator
-                      .asValidator(context),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 20.0, 16.0),
-              child: Container(
-                width: double.infinity,
-                child: TextFormField(
-                  controller: _model.lastNameTextController,
-                  focusNode: _model.lastNameFocusNode,
-                  autofocus: true,
-                  autofillHints: [AutofillHints.email],
-                  obscureText: false,
-                  decoration: InputDecoration(
-                    labelText: 'Last Name',
-                    labelStyle:
-                        FlutterFlowTheme.of(context).labelLarge.override(
-                              fontFamily: 'Readex Pro',
-                              letterSpacing: 0.0,
-                            ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: FlutterFlowTheme.of(context).alternate,
-                        width: 2.0,
-                      ),
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: FlutterFlowTheme.of(context).primary,
-                        width: 2.0,
-                      ),
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: FlutterFlowTheme.of(context).error,
-                        width: 2.0,
-                      ),
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    focusedErrorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: FlutterFlowTheme.of(context).error,
-                        width: 2.0,
-                      ),
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    filled: true,
-                    fillColor: FlutterFlowTheme.of(context).primaryBackground,
-                  ),
-                  style: FlutterFlowTheme.of(context).bodyLarge.override(
-                        fontFamily: 'Readex Pro',
-                        letterSpacing: 0.0,
-                      ),
-                  cursorColor: FlutterFlowTheme.of(context).primary,
-                  validator: _model.lastNameTextControllerValidator
-                      .asValidator(context),
                 ),
               ),
             ),
@@ -537,95 +515,33 @@ class _EditProfileAuthTeacherWidgetState
                           !_model.formKey.currentState!.validate()) {
                         return;
                       }
-                      if (_model.uploadedFileUrl == null ||
-                          _model.uploadedFileUrl.isEmpty) {
-                        await showDialog(
-                          context: context,
-                          builder: (alertDialogContext) {
-                            return WebViewAware(
-                              child: AlertDialog(
-                                title: Text('Invalid'),
-                                content: Text('Please upload a valid picture'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(alertDialogContext),
-                                    child: Text('Ok'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                        return;
-                      }
-                      if (_model.genderValue == null) {
-                        await showDialog(
-                          context: context,
-                          builder: (alertDialogContext) {
-                            return WebViewAware(
-                              child: AlertDialog(
-                                title: Text('Invalid'),
-                                content: Text('Please select a valid gender'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(alertDialogContext),
-                                    child: Text('Ok'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                        return;
-                      }
-                      if (_model.datePicked == null) {
-                        await showDialog(
-                          context: context,
-                          builder: (alertDialogContext) {
-                            return WebViewAware(
-                              child: AlertDialog(
-                                title: Text('Invalid'),
-                                content: Text('Please select a valid birthday'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(alertDialogContext),
-                                    child: Text('Ok'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                        return;
-                      }
                       // updateUserInfo
 
                       firestoreBatch.update(
                           currentUserReference!,
                           createUsersRecordData(
-                            displayName:
-                                '${_model.firstNameTextController.text} ${_model.lastNameTextController.text}',
-                            photoUrl: _model.uploadedFileUrl != null &&
-                                    _model.uploadedFileUrl != ''
-                                ? _model.uploadedFileUrl
-                                : currentUserPhoto,
+                            displayName: _model.fullNameTextController.text,
+                            photoUrl: _model.selectedPhoto,
                             lastActiveTime: getCurrentTimestamp,
-                            firstName: _model.firstNameTextController.text,
-                            lastName: _model.lastNameTextController.text,
                             gender: _model.genderValue,
                             birthday: _model.selectedBirthday,
-                            active: false,
                           ));
+                      if (_model.existingTeacherProfile != null) {
+                        firestoreBatch.update(
+                            _model.existingTeacherProfile!.reference,
+                            createTeacherProfileRecordData(
+                              bio: _model.bioTextController.text,
+                            ));
+                      } else {
+                        firestoreBatch.set(
+                            TeacherProfileRecord.createDoc(
+                                currentUserReference!),
+                            createTeacherProfileRecordData(
+                              user: currentUserReference,
+                              bio: _model.bioTextController.text,
+                            ));
+                      }
 
-                      firestoreBatch.set(
-                          TeacherProfileRecord.createDoc(currentUserReference!),
-                          createTeacherProfileRecordData(
-                            user: currentUserReference,
-                            bio: _model.bioTextController.text,
-                          ));
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
@@ -647,7 +563,7 @@ class _EditProfileAuthTeacherWidgetState
                       await firestoreBatch.commit();
                     }
                   },
-                  text: widget.confirmButtonText,
+                  text: widget!.confirmButtonText,
                   options: FFButtonOptions(
                     width: double.infinity,
                     height: 44.0,

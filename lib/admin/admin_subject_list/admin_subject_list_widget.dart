@@ -10,7 +10,6 @@ import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 import 'admin_subject_list_model.dart';
 export 'admin_subject_list_model.dart';
 
@@ -55,12 +54,10 @@ class _AdminSubjectListWidgetState extends State<AdminSubjectListWidget> {
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         drawer: Drawer(
           elevation: 16.0,
-          child: WebViewAware(
-            child: wrapWithModel(
-              model: _model.adminSidebarModel,
-              updateCallback: () => setState(() {}),
-              child: AdminSidebarWidget(),
-            ),
+          child: wrapWithModel(
+            model: _model.adminSidebarModel,
+            updateCallback: () => setState(() {}),
+            child: AdminSidebarWidget(),
           ),
         ),
         body: SafeArea(
@@ -115,19 +112,16 @@ class _AdminSubjectListWidgetState extends State<AdminSubjectListWidget> {
                                     backgroundColor: Colors.transparent,
                                     alignment: AlignmentDirectional(0.0, 0.0)
                                         .resolve(Directionality.of(context)),
-                                    child: WebViewAware(
-                                      child: GestureDetector(
-                                        onTap: () => _model
-                                                .unfocusNode.canRequestFocus
-                                            ? FocusScope.of(context)
-                                                .requestFocus(
-                                                    _model.unfocusNode)
-                                            : FocusScope.of(context).unfocus(),
-                                        child: Container(
-                                          height: 200.0,
-                                          width: 360.0,
-                                          child: SubjectEditDialogWidget(),
-                                        ),
+                                    child: GestureDetector(
+                                      onTap: () => _model
+                                              .unfocusNode.canRequestFocus
+                                          ? FocusScope.of(context)
+                                              .requestFocus(_model.unfocusNode)
+                                          : FocusScope.of(context).unfocus(),
+                                      child: Container(
+                                        height: 200.0,
+                                        width: 360.0,
+                                        child: SubjectEditDialogWidget(),
                                       ),
                                     ),
                                   );
@@ -307,6 +301,7 @@ class _AdminSubjectListWidgetState extends State<AdminSubjectListWidget> {
                                       List<SubjectsRecord>
                                           listViewSubjectsRecordList =
                                           snapshot.data!;
+
                                       return ListView.builder(
                                         padding: EdgeInsets.zero,
                                         primary: false,
@@ -416,24 +411,25 @@ class _AdminSubjectListWidgetState extends State<AdminSubjectListWidget> {
                                                                         context,
                                                                     builder:
                                                                         (alertDialogContext) {
-                                                                      return WebViewAware(
-                                                                        child:
-                                                                            AlertDialog(
-                                                                          title:
-                                                                              Text('Confirm'),
-                                                                          content:
-                                                                              Text('Are you sure you want to delete this subject?'),
-                                                                          actions: [
-                                                                            TextButton(
-                                                                              onPressed: () => Navigator.pop(alertDialogContext, false),
-                                                                              child: Text('Cancel'),
-                                                                            ),
-                                                                            TextButton(
-                                                                              onPressed: () => Navigator.pop(alertDialogContext, true),
-                                                                              child: Text('Confirm'),
-                                                                            ),
-                                                                          ],
-                                                                        ),
+                                                                      return AlertDialog(
+                                                                        title: Text(
+                                                                            'Confirm'),
+                                                                        content:
+                                                                            Text('Are you sure you want to delete this subject?'),
+                                                                        actions: [
+                                                                          TextButton(
+                                                                            onPressed: () =>
+                                                                                Navigator.pop(alertDialogContext, false),
+                                                                            child:
+                                                                                Text('Cancel'),
+                                                                          ),
+                                                                          TextButton(
+                                                                            onPressed: () =>
+                                                                                Navigator.pop(alertDialogContext, true),
+                                                                            child:
+                                                                                Text('Confirm'),
+                                                                          ),
+                                                                        ],
                                                                       );
                                                                     },
                                                                   ) ??

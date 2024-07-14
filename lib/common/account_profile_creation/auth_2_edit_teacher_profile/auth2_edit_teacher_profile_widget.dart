@@ -12,7 +12,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 import 'auth2_edit_teacher_profile_model.dart';
 export 'auth2_edit_teacher_profile_model.dart';
 
@@ -81,12 +80,10 @@ class _Auth2EditTeacherProfileWidgetState
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
         drawer: Drawer(
           elevation: 16.0,
-          child: WebViewAware(
-            child: wrapWithModel(
-              model: _model.teacherSidebarModel,
-              updateCallback: () => setState(() {}),
-              child: TeacherSidebarWidget(),
-            ),
+          child: wrapWithModel(
+            model: _model.teacherSidebarModel,
+            updateCallback: () => setState(() {}),
+            child: TeacherSidebarWidget(),
           ),
         ),
         body: SafeArea(

@@ -16,7 +16,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 
 class ScheduleEditDialogModel
     extends FlutterFlowModel<ScheduleEditDialogWidget> {
@@ -33,6 +32,18 @@ class ScheduleEditDialogModel
   ///  State fields for stateful widgets in this component.
 
   final formKey = GlobalKey<FormState>();
+  // State field(s) for topic widget.
+  FocusNode? topicFocusNode;
+  TextEditingController? topicTextController;
+  String? Function(BuildContext, String?)? topicTextControllerValidator;
+  String? _topicTextControllerValidator(BuildContext context, String? val) {
+    if (val == null || val.isEmpty) {
+      return 'Field is required';
+    }
+
+    return null;
+  }
+
   // State field(s) for subject widget.
   String? subjectValue;
   FormFieldController<String>? subjectValueController;
@@ -45,12 +56,39 @@ class ScheduleEditDialogModel
   int? maxStudentValue;
   // State field(s) for totalDays widget.
   int? totalDaysValue;
+  // State field(s) for price widget.
+  FocusNode? priceFocusNode;
+  TextEditingController? priceTextController;
+  String? Function(BuildContext, String?)? priceTextControllerValidator;
+  String? _priceTextControllerValidator(BuildContext context, String? val) {
+    if (val == null || val.isEmpty) {
+      return 'Field is required';
+    }
+
+    return null;
+  }
+
   // Stores action output result for [Firestore Query - Query a collection] action in Button widget.
   List<SchedulesRecord>? possibleConflictsSchedules;
+  // Stores action output result for [Backend Call - Create Document] action in Button widget.
+  SchedulesRecord? createdSchedule;
+  // Stores action output result for [Backend Call - Create Document] action in Button widget.
+  SessionsRecord? createdSession;
+  // Stores action output result for [Backend Call - Create Document] action in Button widget.
+  ChatsRecord? createdChatRef;
 
   @override
-  void initState(BuildContext context) {}
+  void initState(BuildContext context) {
+    topicTextControllerValidator = _topicTextControllerValidator;
+    priceTextControllerValidator = _priceTextControllerValidator;
+  }
 
   @override
-  void dispose() {}
+  void dispose() {
+    topicFocusNode?.dispose();
+    topicTextController?.dispose();
+
+    priceFocusNode?.dispose();
+    priceTextController?.dispose();
+  }
 }

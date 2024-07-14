@@ -11,7 +11,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 
 class Auth2ForgotPasswordModel
     extends FlutterFlowModel<Auth2ForgotPasswordWidget> {

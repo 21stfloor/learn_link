@@ -2,6 +2,7 @@ import '/auth/firebase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/actions/actions.dart' as action_blocks;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -28,12 +29,12 @@ class _RedirectionWidgetState extends State<RedirectionWidget> {
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      if (RootPageContext.isInactiveRootPage(context)) {
-        return;
-      }
+      await action_blocks.checkSubscription(context);
+      FFAppState().failedLoginAttempts = 0;
+      setState(() {});
       if (valueOrDefault(currentUserDocument?.role, '') ==
           FFAppConstants.userTypeStudent) {
-        context.goNamed('studentMySessions');
+        context.goNamed('studentDashboard');
       } else {
         if (FFAppConstants.adminEmails.contains(currentUserEmail)) {
           context.goNamed('adminTeacherList');
@@ -55,6 +56,8 @@ class _RedirectionWidgetState extends State<RedirectionWidget> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<FFAppState>();
+
     return GestureDetector(
       onTap: () => _model.unfocusNode.canRequestFocus
           ? FocusScope.of(context).requestFocus(_model.unfocusNode)

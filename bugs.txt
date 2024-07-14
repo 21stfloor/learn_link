@@ -1,0 +1,31 @@
+missing
+
+-refund feature, tutor will process refund, student will provide reason
+-one time rating of student to teacher
+-student transaction receipts page
+-change status text of student session for status of the session not the request
+-increase width of book preview info
+-admin update pricing
+-tutor can set price per lesson
+-remove credit card option
+-milestone edit
+-show receipt viewing of payer
+-show roadmap, lesson, tutor info & price info before booking and paying
+-dashboard label All lessons
+-Tutor can unlock features when subscribed
+-show own rating in tutor profile
+-admin should be able to see tutor certificate
+-tutor registration specific upload button
+-email verification
+
+bugs
+
+-rate button still showing if the session is not done yet
+-teacher session status dropdown
+-quiz list was showing quiz created by other teacher
+-chat not per session
+-price not updating when selecting duration
+-booked session still showing in dashboard
+-when booking duration is not required
+-quiz only shown in mobile
+-quiz cannot be finished

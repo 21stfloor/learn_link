@@ -1,3 +1,4 @@
+import 'package:provider/provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +22,13 @@ void main() async {
 
   await FlutterFlowTheme.initialize();
 
-  runApp(MyApp());
+  final appState = FFAppState(); // Initialize FFAppState
+  await appState.initializePersistedState();
+
+  runApp(ChangeNotifierProvider(
+    create: (context) => appState,
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatefulWidget {
@@ -84,11 +91,71 @@ class _MyAppState extends State<MyApp> {
       supportedLocales: const [Locale('en', '')],
       theme: ThemeData(
         brightness: Brightness.light,
-        useMaterial3: false,
+        scrollbarTheme: ScrollbarThemeData(
+          thumbVisibility: MaterialStateProperty.all(true),
+          trackVisibility: MaterialStateProperty.all(true),
+          interactive: false,
+          thickness: MaterialStateProperty.all(4.0),
+          radius: Radius.circular(4.0),
+          trackColor: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.hovered)) {
+              return Color(4294967295);
+            }
+            return Color(4294967295);
+          }),
+          trackBorderColor: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.hovered)) {
+              return Color(4279506971);
+            }
+            return Color(4279506971);
+          }),
+          thumbColor: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.dragged)) {
+              return Color(4279506971);
+            }
+            if (states.contains(MaterialState.hovered)) {
+              return Color(4279506971);
+            }
+            return Color(4279506971);
+          }),
+          minThumbLength: 4.0,
+          crossAxisMargin: 4.0,
+          mainAxisMargin: 4.0,
+        ),
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        useMaterial3: false,
+        scrollbarTheme: ScrollbarThemeData(
+          thumbVisibility: MaterialStateProperty.all(true),
+          trackVisibility: MaterialStateProperty.all(true),
+          interactive: false,
+          thickness: MaterialStateProperty.all(4.0),
+          radius: Radius.circular(4.0),
+          trackColor: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.hovered)) {
+              return Color(4280099881);
+            }
+            return Color(4280099881);
+          }),
+          trackBorderColor: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.hovered)) {
+              return Color(4294967295);
+            }
+            return Color(4294967295);
+          }),
+          thumbColor: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.dragged)) {
+              return Color(4294967295);
+            }
+            if (states.contains(MaterialState.hovered)) {
+              return Color(4294967295);
+            }
+            return Color(4294967295);
+          }),
+          minThumbLength: 4.0,
+          crossAxisMargin: 4.0,
+          mainAxisMargin: 4.0,
+        ),
       ),
       themeMode: _themeMode,
       routerConfig: _router,

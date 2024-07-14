@@ -8,13 +8,13 @@ import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/upload_data.dart';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 import 'auth2_create_account_model.dart';
 export 'auth2_create_account_model.dart';
 
@@ -203,7 +203,7 @@ class _Auth2CreateAccountWidgetState extends State<Auth2CreateAccountWidget>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    widget.role ==
+                                    widget!.role ==
                                             FFAppConstants.userTypeStudent
                                         ? 'Create Student Account'
                                         : 'Create Teacher Account',
@@ -517,7 +517,7 @@ class _Auth2CreateAccountWidgetState extends State<Auth2CreateAccountWidget>
                                       ),
                                     ),
                                   ),
-                                  if (widget.role ==
+                                  if (widget!.role ==
                                       FFAppConstants.userTypeTeacher)
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
@@ -525,107 +525,318 @@ class _Auth2CreateAccountWidgetState extends State<Auth2CreateAccountWidget>
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
-                                          FFButtonWidget(
-                                            onPressed: () async {
-                                              final selectedFiles =
-                                                  await selectFiles(
-                                                multiFile: true,
-                                              );
-                                              if (selectedFiles != null) {
-                                                setState(() => _model
-                                                    .isDataUploading = true);
-                                                var selectedUploadedFiles =
-                                                    <FFUploadedFile>[];
+                                          Builder(
+                                            builder: (context) {
+                                              if (_model.uploadedValidID ==
+                                                      null ||
+                                                  _model.uploadedValidID ==
+                                                      '') {
+                                                return FFButtonWidget(
+                                                  onPressed: () async {
+                                                    final selectedMedia =
+                                                        await selectMediaWithSourceBottomSheet(
+                                                      context: context,
+                                                      allowPhoto: true,
+                                                    );
+                                                    if (selectedMedia != null &&
+                                                        selectedMedia.every((m) =>
+                                                            validateFileFormat(
+                                                                m.storagePath,
+                                                                context))) {
+                                                      setState(() => _model
+                                                              .isDataUploading1 =
+                                                          true);
+                                                      var selectedUploadedFiles =
+                                                          <FFUploadedFile>[];
 
-                                                var downloadUrls = <String>[];
-                                                try {
-                                                  selectedUploadedFiles =
-                                                      selectedFiles
-                                                          .map((m) =>
-                                                              FFUploadedFile(
-                                                                name: m
-                                                                    .storagePath
-                                                                    .split('/')
-                                                                    .last,
-                                                                bytes: m.bytes,
-                                                              ))
-                                                          .toList();
+                                                      var downloadUrls =
+                                                          <String>[];
+                                                      try {
+                                                        selectedUploadedFiles =
+                                                            selectedMedia
+                                                                .map((m) =>
+                                                                    FFUploadedFile(
+                                                                      name: m
+                                                                          .storagePath
+                                                                          .split(
+                                                                              '/')
+                                                                          .last,
+                                                                      bytes: m
+                                                                          .bytes,
+                                                                      height: m
+                                                                          .dimensions
+                                                                          ?.height,
+                                                                      width: m
+                                                                          .dimensions
+                                                                          ?.width,
+                                                                      blurHash:
+                                                                          m.blurHash,
+                                                                    ))
+                                                                .toList();
 
-                                                  downloadUrls =
-                                                      (await Future.wait(
-                                                    selectedFiles.map(
-                                                      (f) async =>
-                                                          await uploadData(
-                                                              f.storagePath,
-                                                              f.bytes),
+                                                        downloadUrls =
+                                                            (await Future.wait(
+                                                          selectedMedia.map(
+                                                            (m) async =>
+                                                                await uploadData(
+                                                                    m.storagePath,
+                                                                    m.bytes),
+                                                          ),
+                                                        ))
+                                                                .where((u) =>
+                                                                    u != null)
+                                                                .map((u) => u!)
+                                                                .toList();
+                                                      } finally {
+                                                        _model.isDataUploading1 =
+                                                            false;
+                                                      }
+                                                      if (selectedUploadedFiles
+                                                                  .length ==
+                                                              selectedMedia
+                                                                  .length &&
+                                                          downloadUrls.length ==
+                                                              selectedMedia
+                                                                  .length) {
+                                                        setState(() {
+                                                          _model.uploadedLocalFile1 =
+                                                              selectedUploadedFiles
+                                                                  .first;
+                                                          _model.uploadedFileUrl1 =
+                                                              downloadUrls
+                                                                  .first;
+                                                        });
+                                                      } else {
+                                                        setState(() {});
+                                                        return;
+                                                      }
+                                                    }
+
+                                                    _model.uploadedValidID =
+                                                        _model.uploadedFileUrl1;
+                                                    setState(() {});
+                                                  },
+                                                  text: 'Upload Valid ID',
+                                                  options: FFButtonOptions(
+                                                    width: double.infinity,
+                                                    height: 40.0,
+                                                    padding:
+                                                        EdgeInsetsDirectional
+                                                            .fromSTEB(24.0, 0.0,
+                                                                24.0, 0.0),
+                                                    iconPadding:
+                                                        EdgeInsetsDirectional
+                                                            .fromSTEB(0.0, 0.0,
+                                                                0.0, 0.0),
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .secondary,
+                                                    textStyle: FlutterFlowTheme
+                                                            .of(context)
+                                                        .titleSmall
+                                                        .override(
+                                                          fontFamily:
+                                                              'Readex Pro',
+                                                          color: Colors.white,
+                                                          letterSpacing: 0.0,
+                                                        ),
+                                                    elevation: 3.0,
+                                                    borderSide: BorderSide(
+                                                      color: Colors.transparent,
+                                                      width: 1.0,
                                                     ),
-                                                  ))
-                                                          .where(
-                                                              (u) => u != null)
-                                                          .map((u) => u!)
-                                                          .toList();
-                                                } finally {
-                                                  _model.isDataUploading =
-                                                      false;
-                                                }
-                                                if (selectedUploadedFiles
-                                                            .length ==
-                                                        selectedFiles.length &&
-                                                    downloadUrls.length ==
-                                                        selectedFiles.length) {
-                                                  setState(() {
-                                                    _model.uploadedLocalFiles =
-                                                        selectedUploadedFiles;
-                                                    _model.uploadedFileUrls =
-                                                        downloadUrls;
-                                                  });
-                                                } else {
-                                                  setState(() {});
-                                                  return;
-                                                }
-                                              }
-
-                                              _model.uploadedCertificates =
-                                                  _model.uploadedFileUrls
-                                                      .toList()
-                                                      .cast<String>();
-                                              setState(() {});
-                                            },
-                                            text: valueOrDefault<String>(
-                                              (_model.uploadedCertificates
-                                                          .isNotEmpty) ==
-                                                      true
-                                                  ? '${_model.uploadedCertificates.length.toString()} File(s) was uploaded'
-                                                  : 'Upload Certifications',
-                                              'Upload Certifications',
-                                            ),
-                                            options: FFButtonOptions(
-                                              width: double.infinity,
-                                              height: 40.0,
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(
-                                                      24.0, 0.0, 24.0, 0.0),
-                                              iconPadding: EdgeInsetsDirectional
-                                                  .fromSTEB(0.0, 0.0, 0.0, 0.0),
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondary,
-                                              textStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .titleSmall
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        color: Colors.white,
-                                                        letterSpacing: 0.0,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8.0),
+                                                  ),
+                                                );
+                                              } else {
+                                                return Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  children: [
+                                                    ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8.0),
+                                                      child: Image.network(
+                                                        _model.uploadedValidID!,
+                                                        width: 300.0,
+                                                        height: 200.0,
+                                                        fit: BoxFit.cover,
                                                       ),
-                                              elevation: 3.0,
-                                              borderSide: BorderSide(
-                                                color: Colors.transparent,
-                                                width: 1.0,
+                                                    ),
+                                                    FFButtonWidget(
+                                                      onPressed: () async {
+                                                        await FirebaseStorage
+                                                            .instance
+                                                            .refFromURL(_model
+                                                                .uploadedValidID!)
+                                                            .delete();
+                                                        _model.uploadedValidID =
+                                                            null;
+                                                        setState(() {});
+                                                      },
+                                                      text: 'Remove Valid ID',
+                                                      options: FFButtonOptions(
+                                                        height: 40.0,
+                                                        padding:
+                                                            EdgeInsetsDirectional
+                                                                .fromSTEB(
+                                                                    24.0,
+                                                                    0.0,
+                                                                    24.0,
+                                                                    0.0),
+                                                        iconPadding:
+                                                            EdgeInsetsDirectional
+                                                                .fromSTEB(
+                                                                    0.0,
+                                                                    0.0,
+                                                                    0.0,
+                                                                    0.0),
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .error,
+                                                        textStyle:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .titleSmall
+                                                                .override(
+                                                                  fontFamily:
+                                                                      'Readex Pro',
+                                                                  color: Colors
+                                                                      .white,
+                                                                  letterSpacing:
+                                                                      0.0,
+                                                                ),
+                                                        elevation: 3.0,
+                                                        borderSide: BorderSide(
+                                                          color: Colors
+                                                              .transparent,
+                                                          width: 1.0,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8.0),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              }
+                                            },
+                                          ),
+                                          Padding(
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    0.0, 8.0, 0.0, 0.0),
+                                            child: FFButtonWidget(
+                                              onPressed: () async {
+                                                final selectedFiles =
+                                                    await selectFiles(
+                                                  multiFile: true,
+                                                );
+                                                if (selectedFiles != null) {
+                                                  setState(() => _model
+                                                      .isDataUploading2 = true);
+                                                  var selectedUploadedFiles =
+                                                      <FFUploadedFile>[];
+
+                                                  var downloadUrls = <String>[];
+                                                  try {
+                                                    selectedUploadedFiles =
+                                                        selectedFiles
+                                                            .map((m) =>
+                                                                FFUploadedFile(
+                                                                  name: m
+                                                                      .storagePath
+                                                                      .split(
+                                                                          '/')
+                                                                      .last,
+                                                                  bytes:
+                                                                      m.bytes,
+                                                                ))
+                                                            .toList();
+
+                                                    downloadUrls = (await Future
+                                                            .wait(
+                                                      selectedFiles.map(
+                                                        (f) async =>
+                                                            await uploadData(
+                                                                f.storagePath,
+                                                                f.bytes),
+                                                      ),
+                                                    ))
+                                                        .where((u) => u != null)
+                                                        .map((u) => u!)
+                                                        .toList();
+                                                  } finally {
+                                                    _model.isDataUploading2 =
+                                                        false;
+                                                  }
+                                                  if (selectedUploadedFiles
+                                                              .length ==
+                                                          selectedFiles
+                                                              .length &&
+                                                      downloadUrls.length ==
+                                                          selectedFiles
+                                                              .length) {
+                                                    setState(() {
+                                                      _model.uploadedLocalFiles2 =
+                                                          selectedUploadedFiles;
+                                                      _model.uploadedFileUrls2 =
+                                                          downloadUrls;
+                                                    });
+                                                  } else {
+                                                    setState(() {});
+                                                    return;
+                                                  }
+                                                }
+
+                                                _model.uploadedCertificates =
+                                                    _model.uploadedFileUrls2
+                                                        .toList()
+                                                        .cast<String>();
+                                                setState(() {});
+                                              },
+                                              text: valueOrDefault<String>(
+                                                (_model.uploadedCertificates
+                                                            .isNotEmpty) ==
+                                                        true
+                                                    ? '${_model.uploadedCertificates.length.toString()} File(s) was uploaded'
+                                                    : 'Upload Certifications',
+                                                'Upload Certifications',
                                               ),
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
+                                              options: FFButtonOptions(
+                                                width: double.infinity,
+                                                height: 40.0,
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(
+                                                        24.0, 0.0, 24.0, 0.0),
+                                                iconPadding:
+                                                    EdgeInsetsDirectional
+                                                        .fromSTEB(
+                                                            0.0, 0.0, 0.0, 0.0),
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .secondary,
+                                                textStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .titleSmall
+                                                        .override(
+                                                          fontFamily:
+                                                              'Readex Pro',
+                                                          color: Colors.white,
+                                                          letterSpacing: 0.0,
+                                                        ),
+                                                elevation: 3.0,
+                                                borderSide: BorderSide(
+                                                  color: Colors.transparent,
+                                                  width: 1.0,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -642,28 +853,29 @@ class _Auth2CreateAccountWidgetState extends State<Auth2CreateAccountWidget>
                                                 .validate()) {
                                           return;
                                         }
-                                        if (widget.role ==
+                                        if (widget!.role ==
                                             FFAppConstants.userTypeTeacher) {
-                                          if ((_model.uploadedCertificates
-                                                  .isNotEmpty) ==
-                                              false) {
+                                          if (((_model.uploadedCertificates
+                                                      .isNotEmpty) ==
+                                                  false) ||
+                                              (_model.uploadedValidID == null ||
+                                                  _model.uploadedValidID ==
+                                                      '')) {
                                             await showDialog(
                                               context: context,
                                               builder: (alertDialogContext) {
-                                                return WebViewAware(
-                                                  child: AlertDialog(
-                                                    title: Text('Invalid'),
-                                                    content: Text(
-                                                        'Please upload at least 1 certification!'),
-                                                    actions: [
-                                                      TextButton(
-                                                        onPressed: () =>
-                                                            Navigator.pop(
-                                                                alertDialogContext),
-                                                        child: Text('Ok'),
-                                                      ),
-                                                    ],
-                                                  ),
+                                                return AlertDialog(
+                                                  title: Text('Invalid'),
+                                                  content: Text(
+                                                      'Please upload the required files!'),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.pop(
+                                                              alertDialogContext),
+                                                      child: Text('Ok'),
+                                                    ),
+                                                  ],
                                                 );
                                               },
                                             );
@@ -700,14 +912,18 @@ class _Auth2CreateAccountWidgetState extends State<Auth2CreateAccountWidget>
                                         await UsersRecord.collection
                                             .doc(user.uid)
                                             .update(createUsersRecordData(
-                                              role: widget.role,
+                                              role: widget!.role,
                                             ));
 
-                                        if (widget.role ==
+                                        await authManager
+                                            .sendEmailVerification();
+                                        if (widget!.role ==
                                             FFAppConstants.userTypeStudent) {
-                                          context.goNamedAuth(
-                                              'auth_2_createStudentProfile',
-                                              context.mounted);
+                                          GoRouter.of(context)
+                                              .prepareAuthEvent();
+                                          await authManager.signOut();
+                                          GoRouter.of(context)
+                                              .clearRedirectLocation();
                                         } else {
                                           await CertificatesRecord.collection
                                               .doc()
@@ -722,35 +938,35 @@ class _Auth2CreateAccountWidgetState extends State<Auth2CreateAccountWidget>
                                               },
                                             ),
                                           });
-                                          await showDialog(
-                                            context: context,
-                                            builder: (alertDialogContext) {
-                                              return WebViewAware(
-                                                child: AlertDialog(
-                                                  title: Text('Success'),
-                                                  content: Text(
-                                                      'Your account was created successfully, you will be able to login once it is approved.'),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () =>
-                                                          Navigator.pop(
-                                                              alertDialogContext),
-                                                      child: Text('Ok'),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          );
                                           GoRouter.of(context)
                                               .prepareAuthEvent();
                                           await authManager.signOut();
                                           GoRouter.of(context)
                                               .clearRedirectLocation();
-
-                                          context.goNamedAuth(
-                                              'auth_2_Login', context.mounted);
                                         }
+
+                                        await showDialog(
+                                          context: context,
+                                          builder: (alertDialogContext) {
+                                            return AlertDialog(
+                                              title: Text(
+                                                  'Registration Successful'),
+                                              content: Text(
+                                                  'An email verification was sent, please verify your account before you can login'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                          alertDialogContext),
+                                                  child: Text('Ok'),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+
+                                        context.goNamedAuth(
+                                            'auth_2_Login', context.mounted);
                                       },
                                       text: 'Create Account',
                                       options: FFButtonOptions(
@@ -782,7 +998,7 @@ class _Auth2CreateAccountWidgetState extends State<Auth2CreateAccountWidget>
                                   ),
                                   Builder(
                                     builder: (context) {
-                                      if (widget.role ==
+                                      if (widget!.role ==
                                           FFAppConstants.userTypeTeacher) {
                                         return
                                             // You will have to add an action on this rich text to go to your login page.

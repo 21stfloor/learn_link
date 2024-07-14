@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 import 'question_edit_form_model.dart';
 export 'question_edit_form_model.dart';
 
@@ -42,16 +41,16 @@ class _QuestionEditFormWidgetState extends State<QuestionEditFormWidget> {
 
     // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      _model.options = widget.questionToEdit!.options.toList().cast<String>();
+      _model.options = widget!.questionToEdit!.options.toList().cast<String>();
       setState(() {});
     });
 
     _model.questionTextController ??=
-        TextEditingController(text: widget.questionToEdit?.question);
+        TextEditingController(text: widget!.questionToEdit?.question);
     _model.questionFocusNode ??= FocusNode();
 
     _model.correctAnswerTextController ??=
-        TextEditingController(text: widget.questionToEdit?.answer);
+        TextEditingController(text: widget!.questionToEdit?.answer);
     _model.correctAnswerFocusNode ??= FocusNode();
 
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
@@ -148,6 +147,7 @@ class _QuestionEditFormWidgetState extends State<QuestionEditFormWidget> {
                   Builder(
                     builder: (context) {
                       final optionsRows = _model.options.toList();
+
                       return ListView.builder(
                         padding: EdgeInsets.zero,
                         shrinkWrap: true,
@@ -157,14 +157,16 @@ class _QuestionEditFormWidgetState extends State<QuestionEditFormWidget> {
                           final optionsRowsItem = optionsRows[optionsRowsIndex];
                           return wrapWithModel(
                             model: _model.questionOptionEntryModels.getModel(
-                              optionsRowsItem,
+                              optionsRowsIndex.toString(),
                               optionsRowsIndex,
                             ),
                             updateCallback: () => setState(() {}),
                             child: QuestionOptionEntryWidget(
                               key: Key(
-                                'Keyi6w_${optionsRowsItem}',
+                                'Keyi6w_${optionsRowsIndex.toString()}',
                               ),
+                              defaultText: widget!
+                                  .questionToEdit?.options?[optionsRowsIndex],
                               onSubmitAction: (text) async {
                                 _model.updateOptionsAtIndex(
                                   optionsRowsIndex,
@@ -270,19 +272,17 @@ class _QuestionEditFormWidgetState extends State<QuestionEditFormWidget> {
                           await showDialog(
                             context: context,
                             builder: (alertDialogContext) {
-                              return WebViewAware(
-                                child: AlertDialog(
-                                  title: Text('Invalid'),
-                                  content:
-                                      Text('Please add at least two options'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(alertDialogContext),
-                                      child: Text('Ok'),
-                                    ),
-                                  ],
-                                ),
+                              return AlertDialog(
+                                title: Text('Invalid'),
+                                content:
+                                    Text('Please add at least two options'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(alertDialogContext),
+                                    child: Text('Ok'),
+                                  ),
+                                ],
                               );
                             },
                           );
@@ -303,19 +303,17 @@ class _QuestionEditFormWidgetState extends State<QuestionEditFormWidget> {
                           await showDialog(
                             context: context,
                             builder: (alertDialogContext) {
-                              return WebViewAware(
-                                child: AlertDialog(
-                                  title: Text('Invalid'),
-                                  content: Text(
-                                      'The correct answer should be in the options!'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(alertDialogContext),
-                                      child: Text('Ok'),
-                                    ),
-                                  ],
-                                ),
+                              return AlertDialog(
+                                title: Text('Invalid'),
+                                content: Text(
+                                    'The correct answer should be in the options!'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(alertDialogContext),
+                                    child: Text('Ok'),
+                                  ),
+                                ],
                               );
                             },
                           );

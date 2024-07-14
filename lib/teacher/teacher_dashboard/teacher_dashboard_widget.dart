@@ -14,7 +14,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 import 'teacher_dashboard_model.dart';
 export 'teacher_dashboard_model.dart';
 
@@ -73,12 +72,10 @@ class _TeacherDashboardWidgetState extends State<TeacherDashboardWidget>
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
         drawer: Drawer(
           elevation: 16.0,
-          child: WebViewAware(
-            child: wrapWithModel(
-              model: _model.teacherSidebarModel,
-              updateCallback: () => setState(() {}),
-              child: TeacherSidebarWidget(),
-            ),
+          child: wrapWithModel(
+            model: _model.teacherSidebarModel,
+            updateCallback: () => setState(() {}),
+            child: TeacherSidebarWidget(),
           ),
         ),
         body: SafeArea(

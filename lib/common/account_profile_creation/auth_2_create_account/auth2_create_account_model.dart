@@ -9,13 +9,13 @@ import '/flutter_flow/upload_data.dart';
 import 'dart:math';
 import 'auth2_create_account_widget.dart' show Auth2CreateAccountWidget;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 
 class Auth2CreateAccountModel
     extends FlutterFlowModel<Auth2CreateAccountWidget> {
@@ -32,6 +32,8 @@ class Auth2CreateAccountModel
   void updateUploadedCertificatesAtIndex(
           int index, Function(String) updateFn) =>
       uploadedCertificates[index] = updateFn(uploadedCertificates[index]);
+
+  String? uploadedValidID;
 
   ///  State fields for stateful widgets in this page.
 
@@ -81,9 +83,14 @@ class Auth2CreateAccountModel
     return null;
   }
 
-  bool isDataUploading = false;
-  List<FFUploadedFile> uploadedLocalFiles = [];
-  List<String> uploadedFileUrls = [];
+  bool isDataUploading1 = false;
+  FFUploadedFile uploadedLocalFile1 =
+      FFUploadedFile(bytes: Uint8List.fromList([]));
+  String uploadedFileUrl1 = '';
+
+  bool isDataUploading2 = false;
+  List<FFUploadedFile> uploadedLocalFiles2 = [];
+  List<String> uploadedFileUrls2 = [];
 
   @override
   void initState(BuildContext context) {

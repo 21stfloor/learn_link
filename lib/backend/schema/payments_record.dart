@@ -41,12 +41,24 @@ class PaymentsRecord extends FirestoreRecord {
   String get status => _status ?? '';
   bool hasStatus() => _status != null;
 
+  // "receiptNo" field.
+  String? _receiptNo;
+  String get receiptNo => _receiptNo ?? '';
+  bool hasReceiptNo() => _receiptNo != null;
+
+  // "schedule" field.
+  DocumentReference? _schedule;
+  DocumentReference? get schedule => _schedule;
+  bool hasSchedule() => _schedule != null;
+
   void _initializeFields() {
     _user = snapshotData['user'] as DocumentReference?;
     _amount = castToType<double>(snapshotData['amount']);
     _paymentDate = snapshotData['payment_date'] as DateTime?;
     _paymentMethod = snapshotData['payment_method'] as String?;
     _status = snapshotData['status'] as String?;
+    _receiptNo = snapshotData['receiptNo'] as String?;
+    _schedule = snapshotData['schedule'] as DocumentReference?;
   }
 
   static CollectionReference get collection =>
@@ -89,6 +101,8 @@ Map<String, dynamic> createPaymentsRecordData({
   DateTime? paymentDate,
   String? paymentMethod,
   String? status,
+  String? receiptNo,
+  DocumentReference? schedule,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -97,6 +111,8 @@ Map<String, dynamic> createPaymentsRecordData({
       'payment_date': paymentDate,
       'payment_method': paymentMethod,
       'status': status,
+      'receiptNo': receiptNo,
+      'schedule': schedule,
     }.withoutNulls,
   );
 
@@ -112,12 +128,21 @@ class PaymentsRecordDocumentEquality implements Equality<PaymentsRecord> {
         e1?.amount == e2?.amount &&
         e1?.paymentDate == e2?.paymentDate &&
         e1?.paymentMethod == e2?.paymentMethod &&
-        e1?.status == e2?.status;
+        e1?.status == e2?.status &&
+        e1?.receiptNo == e2?.receiptNo &&
+        e1?.schedule == e2?.schedule;
   }
 
   @override
-  int hash(PaymentsRecord? e) => const ListEquality()
-      .hash([e?.user, e?.amount, e?.paymentDate, e?.paymentMethod, e?.status]);
+  int hash(PaymentsRecord? e) => const ListEquality().hash([
+        e?.user,
+        e?.amount,
+        e?.paymentDate,
+        e?.paymentMethod,
+        e?.status,
+        e?.receiptNo,
+        e?.schedule
+      ]);
 
   @override
   bool isValidKey(Object? o) => o is PaymentsRecord;

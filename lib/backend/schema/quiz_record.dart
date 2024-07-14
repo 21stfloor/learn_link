@@ -46,6 +46,11 @@ class QuizRecord extends FirestoreRecord {
   DocumentReference? get createdBy => _createdBy;
   bool hasCreatedBy() => _createdBy != null;
 
+  // "passingScore" field.
+  double? _passingScore;
+  double get passingScore => _passingScore ?? 0.0;
+  bool hasPassingScore() => _passingScore != null;
+
   void _initializeFields() {
     _name = snapshotData['name'] as String?;
     _questions = getDataList(snapshotData['questions']);
@@ -53,6 +58,7 @@ class QuizRecord extends FirestoreRecord {
     _updatedAt = snapshotData['updatedAt'] as DateTime?;
     _createdAt = snapshotData['createdAt'] as DateTime?;
     _createdBy = snapshotData['createdBy'] as DocumentReference?;
+    _passingScore = castToType<double>(snapshotData['passingScore']);
   }
 
   static CollectionReference get collection =>
@@ -94,6 +100,7 @@ Map<String, dynamic> createQuizRecordData({
   DateTime? updatedAt,
   DateTime? createdAt,
   DocumentReference? createdBy,
+  double? passingScore,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -102,6 +109,7 @@ Map<String, dynamic> createQuizRecordData({
       'updatedAt': updatedAt,
       'createdAt': createdAt,
       'createdBy': createdBy,
+      'passingScore': passingScore,
     }.withoutNulls,
   );
 
@@ -119,7 +127,8 @@ class QuizRecordDocumentEquality implements Equality<QuizRecord> {
         e1?.subject == e2?.subject &&
         e1?.updatedAt == e2?.updatedAt &&
         e1?.createdAt == e2?.createdAt &&
-        e1?.createdBy == e2?.createdBy;
+        e1?.createdBy == e2?.createdBy &&
+        e1?.passingScore == e2?.passingScore;
   }
 
   @override
@@ -129,7 +138,8 @@ class QuizRecordDocumentEquality implements Equality<QuizRecord> {
         e?.subject,
         e?.updatedAt,
         e?.createdAt,
-        e?.createdBy
+        e?.createdBy,
+        e?.passingScore
       ]);
 
   @override

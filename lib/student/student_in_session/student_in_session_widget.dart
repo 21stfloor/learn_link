@@ -7,6 +7,7 @@ import '/common/video_call_widget/video_call_widget_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/student/student_action_list/student_action_list_widget.dart';
 import '/student/student_sidebar/student_sidebar_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
@@ -15,17 +16,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 import 'student_in_session_model.dart';
 export 'student_in_session_model.dart';
 
 class StudentInSessionWidget extends StatefulWidget {
   const StudentInSessionWidget({
     super.key,
-    this.chatRef,
+    required this.chatDoc,
+    required this.schedule,
+    required this.session,
   });
 
-  final DocumentReference? chatRef;
+  final ChatsRecord? chatDoc;
+  final SchedulesRecord? schedule;
+  final SessionsRecord? session;
 
   @override
   State<StudentInSessionWidget> createState() => _StudentInSessionWidgetState();
@@ -35,8 +39,6 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
   late StudentInSessionModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
-
-  var _isReady = false;
 
   @override
   void initState() {
@@ -54,12 +56,8 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
 
         return;
       } else {
-        _model.chatDoc = await ChatsRecord.getDocumentOnce(widget.chatRef!);
-        setState(() {
-          _isReady = true;
-        });
-        if (!_model.chatDoc!.users.contains(currentUserReference)) {
-          await widget.chatRef!.update({
+        if (!widget!.chatDoc!.users.contains(currentUserReference)) {
+          await widget!.chatDoc!.reference.update({
             ...mapToFirestore(
               {
                 'users': FieldValue.arrayUnion([currentUserReference]),
@@ -91,12 +89,10 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
         drawer: Drawer(
           elevation: 16.0,
-          child: WebViewAware(
-            child: wrapWithModel(
-              model: _model.studentSidebarModel,
-              updateCallback: () => setState(() {}),
-              child: StudentSidebarWidget(),
-            ),
+          child: wrapWithModel(
+            model: _model.studentSidebarModel,
+            updateCallback: () => setState(() {}),
+            child: StudentSidebarWidget(),
           ),
         ),
         endDrawer: Container(
@@ -113,13 +109,11 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
           }(),
           child: Drawer(
             elevation: 16.0,
-            child: WebViewAware(
-              child: wrapWithModel(
-                model: _model.chatThreadComponentModel,
-                updateCallback: () => setState(() {}),
-                child: ChatThreadComponentWidget(
-                  chatRef: _model.chatDoc,
-                ),
+            child: wrapWithModel(
+              model: _model.chatThreadComponentModel,
+              updateCallback: () => setState(() {}),
+              child: ChatThreadComponentWidget(
+                chatRef: widget!.chatDoc!,
               ),
             ),
           ),
@@ -140,7 +134,7 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                   updateCallback: () => setState(() {}),
                   child: DrawerToggleWidget(),
                 ),
-              _isReady? Expanded(
+              Expanded(
                 flex: 10,
                 child: Align(
                   alignment: AlignmentDirectional(0.0, 0.0),
@@ -192,28 +186,25 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                                         await showModalBottomSheet(
                                           isScrollControlled: true,
                                           backgroundColor:
-                                          FlutterFlowTheme.of(context)
-                                              .accent4,
+                                              FlutterFlowTheme.of(context)
+                                                  .accent4,
                                           barrierColor: Color(0x00FFFFFF),
                                           context: context,
                                           builder: (context) {
-                                            return WebViewAware(
-                                              child: GestureDetector(
-                                                onTap: () => _model.unfocusNode
-                                                    .canRequestFocus
-                                                    ? FocusScope.of(context)
-                                                    .requestFocus(
-                                                    _model.unfocusNode)
-                                                    : FocusScope.of(context)
-                                                    .unfocus(),
-                                                child: Padding(
-                                                  padding:
-                                                  MediaQuery.viewInsetsOf(
-                                                      context),
-                                                  child:
-                                                  ChatDetailsOverlayWidget(
-                                                    chatRef: _model.chatDoc!,
-                                                  ),
+                                            return GestureDetector(
+                                              onTap: () => _model.unfocusNode
+                                                      .canRequestFocus
+                                                  ? FocusScope.of(context)
+                                                      .requestFocus(
+                                                          _model.unfocusNode)
+                                                  : FocusScope.of(context)
+                                                      .unfocus(),
+                                              child: Padding(
+                                                padding:
+                                                    MediaQuery.viewInsetsOf(
+                                                        context),
+                                                child: ChatDetailsOverlayWidget(
+                                                  chatDoc: widget!.chatDoc!,
                                                 ),
                                               ),
                                             );
@@ -230,52 +221,10 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                                         padding: EdgeInsetsDirectional.fromSTEB(
                                             24.0, 0.0, 24.0, 0.0),
                                         iconPadding:
-                                        EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 0.0, 0.0, 0.0),
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondary,
-                                        textStyle: FlutterFlowTheme.of(context)
-                                            .titleSmall
-                                            .override(
-                                          fontFamily: 'Readex Pro',
-                                          color: Colors.white,
-                                          letterSpacing: 0.0,
-                                        ),
-                                        elevation: 3.0,
-                                        borderSide: BorderSide(
-                                          color: Colors.transparent,
-                                          width: 1.0,
-                                        ),
-                                        borderRadius:
-                                        BorderRadius.circular(8.0),
-                                      ),
-                                    ),
-                                  ),
-                                if (responsiveVisibility(
-                                  context: context,
-                                  tabletLandscape: false,
-                                  desktop: false,
-                                ))
-                                  Align(
-                                    alignment: AlignmentDirectional(1.0, -1.0),
-                                    child: FFButtonWidget(
-                                      onPressed: () {
-                                        print('Button pressed ...');
-                                      },
-                                      text: '',
-                                      icon: Icon(
-                                        Icons.fact_check,
-                                        size: 36.0,
-                                      ),
-                                      options: FFButtonOptions(
-                                        height: 40.0,
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            24.0, 0.0, 24.0, 0.0),
-                                        iconPadding:
                                             EdgeInsetsDirectional.fromSTEB(
                                                 0.0, 0.0, 0.0, 0.0),
                                         color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                            .secondary,
                                         textStyle: FlutterFlowTheme.of(context)
                                             .titleSmall
                                             .override(
@@ -290,6 +239,82 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                                         ),
                                         borderRadius:
                                             BorderRadius.circular(8.0),
+                                      ),
+                                    ),
+                                  ),
+                                if (responsiveVisibility(
+                                  context: context,
+                                  tabletLandscape: false,
+                                  desktop: false,
+                                ))
+                                  Align(
+                                    alignment: AlignmentDirectional(1.0, -1.0),
+                                    child: Builder(
+                                      builder: (context) => FFButtonWidget(
+                                        onPressed: () async {
+                                          await showDialog(
+                                            barrierDismissible: false,
+                                            context: context,
+                                            builder: (dialogContext) {
+                                              return Dialog(
+                                                elevation: 0,
+                                                insetPadding: EdgeInsets.zero,
+                                                backgroundColor:
+                                                    Colors.transparent,
+                                                alignment: AlignmentDirectional(
+                                                        0.0, 0.0)
+                                                    .resolve(Directionality.of(
+                                                        context)),
+                                                child: GestureDetector(
+                                                  onTap: () => _model
+                                                          .unfocusNode
+                                                          .canRequestFocus
+                                                      ? FocusScope.of(context)
+                                                          .requestFocus(_model
+                                                              .unfocusNode)
+                                                      : FocusScope.of(context)
+                                                          .unfocus(),
+                                                  child:
+                                                      StudentActionListWidget(
+                                                    schedule: widget!.schedule!,
+                                                    session: widget!.session!,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ).then((value) => setState(() {}));
+                                        },
+                                        text: '',
+                                        icon: Icon(
+                                          Icons.fact_check,
+                                          size: 36.0,
+                                        ),
+                                        options: FFButtonOptions(
+                                          height: 40.0,
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  24.0, 0.0, 24.0, 0.0),
+                                          iconPadding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0.0, 0.0, 0.0, 0.0),
+                                          color: FlutterFlowTheme.of(context)
+                                              .primary,
+                                          textStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .titleSmall
+                                                  .override(
+                                                    fontFamily: 'Readex Pro',
+                                                    color: Colors.white,
+                                                    letterSpacing: 0.0,
+                                                  ),
+                                          elevation: 3.0,
+                                          borderSide: BorderSide(
+                                            color: Colors.transparent,
+                                            width: 1.0,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -315,11 +340,11 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                                     textStyle: FlutterFlowTheme.of(context)
                                         .titleSmall
                                         .override(
-                                      fontFamily: 'Readex Pro',
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryBackground,
-                                      letterSpacing: 0.0,
-                                    ),
+                                          fontFamily: 'Readex Pro',
+                                          color: FlutterFlowTheme.of(context)
+                                              .secondaryBackground,
+                                          letterSpacing: 0.0,
+                                        ),
                                     elevation: 3.0,
                                     borderSide: BorderSide(
                                       color: Colors.transparent,
@@ -336,7 +361,7 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                                 child: Container(
                                   width: MediaQuery.sizeOf(context).width * 1.0,
                                   height:
-                                  MediaQuery.sizeOf(context).height * 1.0,
+                                      MediaQuery.sizeOf(context).height * 1.0,
                                   decoration: BoxDecoration(),
                                   alignment: AlignmentDirectional(0.0, 0.0),
                                   child: Row(
@@ -344,56 +369,33 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                                     children: [
                                       Expanded(
                                         flex: 9,
-                                        child: StreamBuilder<SessionsRecord>(
-                                          stream: SessionsRecord.getDocument(
-                                              _model.chatDoc!.chatSession!),
-                                          builder: (context, snapshot) {
-                                            // Customize what your widget looks like when it's loading.
-                                            if (!snapshot.hasData) {
-                                              return Center(
-                                                child: SizedBox(
-                                                  width: 50.0,
-                                                  height: 50.0,
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    valueColor:
-                                                        AlwaysStoppedAnimation<
-                                                            Color>(
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .primary,
-                                                    ),
-                                                  ),
+                                        child: Builder(
+                                          builder: (context) {
+                                            if (widget!.session!
+                                                    .hasVideoCallStatus() &&
+                                                widget!
+                                                    .session!.videoCallStatus) {
+                                              return wrapWithModel(
+                                                model:
+                                                    _model.videoCallWidgetModel,
+                                                updateCallback: () =>
+                                                    setState(() {}),
+                                                child: VideoCallWidgetWidget(
+                                                  chatRef: widget!.chatDoc!,
                                                 ),
                                               );
-                                            }
-                                            final conditionalBuilderSessionsRecord =
-                                                snapshot.data!;
-                                            return Builder(
-                                              builder: (context) {
-                                                if (conditionalBuilderSessionsRecord
-                                                    .videoCallStatus) {
-                                                  return wrapWithModel(
-                                                    model: _model
-                                                        .videoCallWidgetModel,
-                                                    updateCallback: () =>
-                                                        setState(() {}),
-                                                    child:
-                                                        VideoCallWidgetWidget(
-                                                      chatRef: _model.chatDoc!,
-                                                    ),
-                                                  );
-                                                } else {
-                                                  return RichText(
-                                                    textScaler:
-                                                        MediaQuery.of(context)
-                                                            .textScaler,
-                                                    text: TextSpan(
-                                                      children: [
-                                                        TextSpan(
-                                                          text: 'Video Call ',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
+                                            } else {
+                                              return RichText(
+                                                textScaler:
+                                                    MediaQuery.of(context)
+                                                        .textScaler,
+                                                text: TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text: 'Video Call ',
+                                                      style:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
                                                               .titleMedium
                                                               .override(
                                                                 fontFamily:
@@ -405,107 +407,106 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                                                                 letterSpacing:
                                                                     0.0,
                                                               ),
-                                                        ),
-                                                        TextSpan(
-                                                          text:
-                                                              '\nis currently off',
-                                                          style: TextStyle(
-                                                            color: FlutterFlowTheme
-                                                                    .of(context)
-                                                                .primaryText,
-                                                            fontSize: 36.0,
-                                                          ),
-                                                        ),
-                                                        TextSpan(
-                                                          text:
-                                                              '\nPlease wait for your tutor to start the video call',
-                                                          style: TextStyle(
-                                                            color: FlutterFlowTheme
-                                                                    .of(context)
-                                                                .primaryText,
-                                                            fontSize: 16.0,
-                                                          ),
-                                                        )
-                                                      ],
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                            fontFamily:
-                                                                'Readex Pro',
-                                                            letterSpacing: 0.0,
-                                                          ),
                                                     ),
-                                                    textAlign: TextAlign.center,
-                                                  );
-                                                }
-                                              },
-                                            );
+                                                    TextSpan(
+                                                      text:
+                                                          '\nis currently off',
+                                                      style: TextStyle(
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .primaryText,
+                                                        fontSize: 36.0,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text:
+                                                          '\nPlease wait for your tutor to start the video call',
+                                                      style: TextStyle(
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .primaryText,
+                                                        fontSize: 16.0,
+                                                      ),
+                                                    )
+                                                  ],
+                                                  style: FlutterFlowTheme.of(
+                                                          context)
+                                                      .bodyMedium
+                                                      .override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        letterSpacing: 0.0,
+                                                      ),
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              );
+                                            }
                                           },
                                         ),
                                       ),
                                       Column(
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
-                                      if (responsiveVisibility(
-                                        context: context,
-                                        phone: false,
-                                        tablet: false,
-                                      ))
-                                        Align(
+                                          if (responsiveVisibility(
+                                            context: context,
+                                            phone: false,
+                                            tablet: false,
+                                          ))
+                                            Align(
                                               alignment: AlignmentDirectional(
                                                   1.0, -1.0),
-                                          child: Padding(
+                                              child: Padding(
                                                 padding: EdgeInsetsDirectional
                                                     .fromSTEB(
-                                                0.0, 10.0, 0.0, 0.0),
-                                            child: FFButtonWidget(
-                                              onPressed: () async {
-                                                await showModalBottomSheet(
-                                                  isScrollControlled: true,
-                                                  backgroundColor:
-                                                  FlutterFlowTheme.of(
-                                                      context)
-                                                      .accent4,
-                                                  barrierColor:
-                                                  Color(0x00FFFFFF),
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return WebViewAware(
-                                                      child: GestureDetector(
-                                                        onTap: () => _model
-                                                            .unfocusNode
-                                                            .canRequestFocus
-                                                            ? FocusScope.of(
-                                                            context)
-                                                            .requestFocus(_model
-                                                            .unfocusNode)
-                                                            : FocusScope.of(
-                                                            context)
-                                                            .unfocus(),
-                                                        child: Padding(
-                                                          padding: MediaQuery
-                                                              .viewInsetsOf(
-                                                              context),
-                                                          child:
-                                                          ChatDetailsOverlayWidget(
-                                                            chatRef:
-                                                            _model.chatDoc!,
+                                                        0.0, 10.0, 0.0, 0.0),
+                                                child: FFButtonWidget(
+                                                  onPressed: () async {
+                                                    await showModalBottomSheet(
+                                                      isScrollControlled: true,
+                                                      backgroundColor:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .accent4,
+                                                      barrierColor:
+                                                          Color(0x00FFFFFF),
+                                                      context: context,
+                                                      builder: (context) {
+                                                        return GestureDetector(
+                                                          onTap: () => _model
+                                                                  .unfocusNode
+                                                                  .canRequestFocus
+                                                              ? FocusScope.of(
+                                                                      context)
+                                                                  .requestFocus(
+                                                                      _model
+                                                                          .unfocusNode)
+                                                              : FocusScope.of(
+                                                                      context)
+                                                                  .unfocus(),
+                                                          child: Padding(
+                                                            padding: MediaQuery
+                                                                .viewInsetsOf(
+                                                                    context),
+                                                            child:
+                                                                ChatDetailsOverlayWidget(
+                                                              chatDoc: widget!
+                                                                  .chatDoc!,
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ),
-                                                    );
+                                                        );
+                                                      },
+                                                    ).then((value) =>
+                                                        safeSetState(() {}));
                                                   },
-                                                ).then((value) =>
-                                                    safeSetState(() {}));
-                                              },
-                                              text: '',
-                                              icon: Icon(
-                                                Icons.people_outline_sharp,
-                                                size: 36.0,
-                                              ),
-                                              options: FFButtonOptions(
-                                                height: 40.0,
+                                                  text: '',
+                                                  icon: Icon(
+                                                    Icons.people_outline_sharp,
+                                                    size: 36.0,
+                                                  ),
+                                                  options: FFButtonOptions(
+                                                    height: 40.0,
                                                     padding:
                                                         EdgeInsetsDirectional
                                                             .fromSTEB(24.0, 0.0,
@@ -543,47 +544,91 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                                             phone: false,
                                             tablet: false,
                                           ))
-                                            FFButtonWidget(
-                                              onPressed: () {
-                                                print('Button pressed ...');
-                                              },
-                                              text: '',
-                                              icon: Icon(
-                                                Icons.fact_check,
-                                                size: 36.0,
-                                              ),
-                                              options: FFButtonOptions(
-                                                height: 40.0,
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                    24.0, 0.0, 24.0, 0.0),
-                                                iconPadding:
-                                                EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                    0.0, 0.0, 0.0, 0.0),
-                                                color:
-                                                FlutterFlowTheme.of(context)
-                                                        .primary,
-                                                textStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .titleSmall
-                                                    .override(
-                                                  fontFamily:
-                                                  'Readex Pro',
-                                                  color: Colors.white,
-                                                  letterSpacing: 0.0,
+                                            Builder(
+                                              builder: (context) =>
+                                                  FFButtonWidget(
+                                                onPressed: () async {
+                                                  await showDialog(
+                                                    barrierDismissible: false,
+                                                    context: context,
+                                                    builder: (dialogContext) {
+                                                      return Dialog(
+                                                        elevation: 0,
+                                                        insetPadding:
+                                                            EdgeInsets.zero,
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        alignment:
+                                                            AlignmentDirectional(
+                                                                    0.0, 0.0)
+                                                                .resolve(
+                                                                    Directionality.of(
+                                                                        context)),
+                                                        child: GestureDetector(
+                                                          onTap: () => _model
+                                                                  .unfocusNode
+                                                                  .canRequestFocus
+                                                              ? FocusScope.of(
+                                                                      context)
+                                                                  .requestFocus(
+                                                                      _model
+                                                                          .unfocusNode)
+                                                              : FocusScope.of(
+                                                                      context)
+                                                                  .unfocus(),
+                                                          child:
+                                                              StudentActionListWidget(
+                                                            schedule: widget!
+                                                                .schedule!,
+                                                            session: widget!
+                                                                .session!,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                  ).then((value) =>
+                                                      setState(() {}));
+                                                },
+                                                text: '',
+                                                icon: Icon(
+                                                  Icons.fact_check,
+                                                  size: 36.0,
                                                 ),
-                                                elevation: 3.0,
-                                                borderSide: BorderSide(
-                                                  color: Colors.transparent,
-                                                  width: 1.0,
+                                                options: FFButtonOptions(
+                                                  height: 40.0,
+                                                  padding: EdgeInsetsDirectional
+                                                      .fromSTEB(
+                                                          24.0, 0.0, 24.0, 0.0),
+                                                  iconPadding:
+                                                      EdgeInsetsDirectional
+                                                          .fromSTEB(0.0, 0.0,
+                                                              0.0, 0.0),
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .primary,
+                                                  textStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .titleSmall
+                                                          .override(
+                                                            fontFamily:
+                                                                'Readex Pro',
+                                                            color: Colors.white,
+                                                            letterSpacing: 0.0,
+                                                          ),
+                                                  elevation: 3.0,
+                                                  borderSide: BorderSide(
+                                                    color: Colors.transparent,
+                                                    width: 1.0,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          8.0),
                                                 ),
-                                                borderRadius:
-                                                BorderRadius.circular(8.0),
                                               ),
                                             ),
                                         ].divide(SizedBox(height: 10.0)),
-                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -595,8 +640,7 @@ class _StudentInSessionWidgetState extends State<StudentInSessionWidget> {
                     ),
                   ),
                 ),
-              ): Container()
-              ,
+              ),
             ],
           ),
         ),

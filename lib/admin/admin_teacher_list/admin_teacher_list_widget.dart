@@ -15,7 +15,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:text_search/text_search.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 import 'admin_teacher_list_model.dart';
 export 'admin_teacher_list_model.dart';
 
@@ -72,12 +71,10 @@ class _AdminTeacherListWidgetState extends State<AdminTeacherListWidget> {
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         drawer: Drawer(
           elevation: 16.0,
-          child: WebViewAware(
-            child: wrapWithModel(
-              model: _model.adminSidebarModel,
-              updateCallback: () => setState(() {}),
-              child: AdminSidebarWidget(),
-            ),
+          child: wrapWithModel(
+            model: _model.adminSidebarModel,
+            updateCallback: () => setState(() {}),
+            child: AdminSidebarWidget(),
           ),
         ),
         body: SafeArea(
@@ -264,6 +261,7 @@ class _AdminTeacherListWidgetState extends State<AdminTeacherListWidget> {
                                     builder: (context) {
                                       final teacherRows =
                                           _model.teachers.toList();
+
                                       return ListView.builder(
                                         padding: EdgeInsets.zero,
                                         primary: false,
@@ -473,9 +471,10 @@ class _AdminTeacherListWidgetState extends State<AdminTeacherListWidget> {
                                                             Text(
                                                               valueOrDefault<
                                                                   String>(
-                                                                teacherRowsItem
-                                                                    .createdTime
-                                                                    ?.toString(),
+                                                                dateTimeFormat(
+                                                                    'yMMMd',
+                                                                    teacherRowsItem
+                                                                        .createdTime),
                                                                 '-',
                                                               ),
                                                               style: FlutterFlowTheme
@@ -517,28 +516,18 @@ class _AdminTeacherListWidgetState extends State<AdminTeacherListWidget> {
                                                                           Directionality.of(
                                                                               context)),
                                                                   child:
-                                                                      WebViewAware(
+                                                                      GestureDetector(
+                                                                    onTap: () => _model
+                                                                            .unfocusNode
+                                                                            .canRequestFocus
+                                                                        ? FocusScope.of(context).requestFocus(_model
+                                                                            .unfocusNode)
+                                                                        : FocusScope.of(context)
+                                                                            .unfocus(),
                                                                     child:
-                                                                        GestureDetector(
-                                                                      onTap: () => _model
-                                                                              .unfocusNode
-                                                                              .canRequestFocus
-                                                                          ? FocusScope.of(context).requestFocus(_model
-                                                                              .unfocusNode)
-                                                                          : FocusScope.of(context)
-                                                                              .unfocus(),
-                                                                      child:
-                                                                          Container(
-                                                                        height:
-                                                                            960.0,
-                                                                        width:
-                                                                            400.0,
-                                                                        child:
-                                                                            TeacherProfilePreviewWidget(
-                                                                          teacherUser:
-                                                                              teacherRowsItem,
-                                                                        ),
-                                                                      ),
+                                                                        TeacherProfilePreviewWidget(
+                                                                      teacherUser:
+                                                                          teacherRowsItem,
                                                                     ),
                                                                   ),
                                                                 );
@@ -546,6 +535,9 @@ class _AdminTeacherListWidgetState extends State<AdminTeacherListWidget> {
                                                             ).then((value) =>
                                                                 setState(
                                                                     () {}));
+
+                                                            context.goNamed(
+                                                                'adminTeacherList');
                                                           },
                                                           text: 'View',
                                                           options:

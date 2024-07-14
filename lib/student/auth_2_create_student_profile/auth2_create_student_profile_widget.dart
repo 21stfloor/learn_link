@@ -195,7 +195,7 @@ class _Auth2CreateStudentProfileWidgetState
                             confirmButtonText: 'Save & Continue',
                             role: FFAppConstants.userTypeStudent,
                             navigateAction: () async {
-                              context.goNamed('studentMySessions');
+                              context.goNamed('student_skill_rating');
                             },
                           ),
                         ),

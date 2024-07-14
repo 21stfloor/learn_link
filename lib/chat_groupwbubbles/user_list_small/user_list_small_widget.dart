@@ -50,133 +50,30 @@ class _UserListSmallWidgetState extends State<UserListSmallWidget> {
   @override
   Widget build(BuildContext context) {
     return Visibility(
-      visible: widget.userRef?.role == FFAppConstants.userTypeStudent,
+      visible: widget!.userRef?.role == FFAppConstants.userTypeStudent,
       child: MouseRegion(
-      opaque: false,
-      cursor: MouseCursor.defer ?? MouseCursor.defer,
-      child: AnimatedContainer(
-        duration: Duration(milliseconds: 150),
-        curve: Curves.easeInOut,
-        decoration: BoxDecoration(
-          color: _model.iuserHovered!
-              ? FlutterFlowTheme.of(context).primaryBackground
-              : FlutterFlowTheme.of(context).secondaryBackground,
-          borderRadius: BorderRadius.circular(12.0),
-          border: Border.all(
-            color: FlutterFlowTheme.of(context).alternate,
+        opaque: false,
+        cursor: MouseCursor.defer ?? MouseCursor.defer,
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 150),
+          curve: Curves.easeInOut,
+          decoration: BoxDecoration(
+            color: _model.iuserHovered!
+                ? FlutterFlowTheme.of(context).primaryBackground
+                : FlutterFlowTheme.of(context).secondaryBackground,
+            borderRadius: BorderRadius.circular(12.0),
+            border: Border.all(
+              color: FlutterFlowTheme.of(context).alternate,
+            ),
           ),
-        ),
-        child: Padding(
-          padding: EdgeInsetsDirectional.fromSTEB(12.0, 8.0, 12.0, 8.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Container(
-                width: 40.0,
-                height: 40.0,
-                decoration: BoxDecoration(
-                  color: FlutterFlowTheme.of(context).accent1,
-                  borderRadius: BorderRadius.circular(12.0),
-                  border: Border.all(
-                    color: FlutterFlowTheme.of(context).primary,
-                    width: 2.0,
-                  ),
-                ),
-                child: Builder(
-                  builder: (context) {
-                    if (widget.userRef?.photoUrl != null &&
-                        widget.userRef?.photoUrl != '') {
-                      return Padding(
-                        padding: EdgeInsets.all(2.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8.0),
-                          child: CachedNetworkImage(
-                            fadeInDuration: Duration(milliseconds: 200),
-                            fadeOutDuration: Duration(milliseconds: 200),
-                            imageUrl: widget.userRef!.photoUrl,
-                            width: 44.0,
-                            height: 44.0,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      );
-                    } else {
-                      return Padding(
-                        padding: EdgeInsets.all(2.0),
-                        child: Container(
-                          width: 100.0,
-                          height: 100.0,
-                          decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context)
-                                .secondaryBackground,
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          alignment: AlignmentDirectional(0.0, 0.0),
-                          child: Text(
-                            valueOrDefault<String>(
-                              widget.userRef?.displayName,
-                              'A',
-                            ).maybeHandleOverflow(maxChars: 1),
-                            textAlign: TextAlign.center,
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyLarge
-                                  .override(
-                                      fontFamily: 'Readex Pro',
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                          ),
-                        ),
-                      );
-                    }
-                  },
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 8.0, 0.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        valueOrDefault<String>(
-                          widget.userRef?.displayName,
-                          'Ghost User',
-                        ),
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                              fontFamily: 'Readex Pro',
-                              letterSpacing: 0.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                      Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
-                              0.0, 4.0, 0.0, 0.0),
-                        child: Text(
-                          valueOrDefault<String>(
-                            widget.userRef?.role,
-                            '--',
-                          ),
-                            style: FlutterFlowTheme.of(context)
-                                .bodySmall
-                                .override(
-                                    fontFamily: 'Readex Pro',
-                                    color: FlutterFlowTheme.of(context).primary,
-                                    letterSpacing: 0.0,
-                                  ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              if (currentUserReference == widget.userRef?.reference)
+          child: Padding(
+            padding: EdgeInsetsDirectional.fromSTEB(12.0, 8.0, 12.0, 8.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
                 Container(
-                  height: 32.0,
+                  width: 40.0,
+                  height: 40.0,
                   decoration: BoxDecoration(
                     color: FlutterFlowTheme.of(context).accent1,
                     borderRadius: BorderRadius.circular(12.0),
@@ -185,33 +82,136 @@ class _UserListSmallWidgetState extends State<UserListSmallWidget> {
                       width: 2.0,
                     ),
                   ),
-                  child: Align(
-                    alignment: AlignmentDirectional(0.0, 0.0),
-                    child: Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(8.0, 0.0, 8.0, 0.0),
-                      child: Text(
-                        'ME',
-                        textAlign: TextAlign.center,
+                  child: Builder(
+                    builder: (context) {
+                      if (widget!.userRef?.photoUrl != null &&
+                          widget!.userRef?.photoUrl != '') {
+                        return Padding(
+                          padding: EdgeInsets.all(2.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: CachedNetworkImage(
+                              fadeInDuration: Duration(milliseconds: 200),
+                              fadeOutDuration: Duration(milliseconds: 200),
+                              imageUrl: widget!.userRef!.photoUrl,
+                              width: 44.0,
+                              height: 44.0,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        );
+                      } else {
+                        return Padding(
+                          padding: EdgeInsets.all(2.0),
+                          child: Container(
+                            width: 100.0,
+                            height: 100.0,
+                            decoration: BoxDecoration(
+                              color: FlutterFlowTheme.of(context)
+                                  .secondaryBackground,
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            alignment: AlignmentDirectional(0.0, 0.0),
+                            child: Text(
+                              valueOrDefault<String>(
+                                widget!.userRef?.displayName,
+                                'A',
+                              ).maybeHandleOverflow(maxChars: 1),
+                              textAlign: TextAlign.center,
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyLarge
+                                  .override(
+                                    fontFamily: 'Readex Pro',
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 8.0, 0.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          valueOrDefault<String>(
+                            widget!.userRef?.displayName,
+                            'Ghost User',
+                          ),
                           style:
                               FlutterFlowTheme.of(context).bodyMedium.override(
-                              fontFamily: 'Readex Pro',
-                              letterSpacing: 0.0,
+                                    fontFamily: 'Readex Pro',
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                              0.0, 4.0, 0.0, 0.0),
+                          child: Text(
+                            valueOrDefault<String>(
+                              widget!.userRef?.role,
+                              '--',
                             ),
-                      ),
+                            style: FlutterFlowTheme.of(context)
+                                .bodySmall
+                                .override(
+                                  fontFamily: 'Readex Pro',
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  letterSpacing: 0.0,
+                                ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-            ],
+                if (currentUserReference == widget!.userRef?.reference)
+                  Container(
+                    height: 32.0,
+                    decoration: BoxDecoration(
+                      color: FlutterFlowTheme.of(context).accent1,
+                      borderRadius: BorderRadius.circular(12.0),
+                      border: Border.all(
+                        color: FlutterFlowTheme.of(context).primary,
+                        width: 2.0,
+                      ),
+                    ),
+                    child: Align(
+                      alignment: AlignmentDirectional(0.0, 0.0),
+                      child: Padding(
+                        padding:
+                            EdgeInsetsDirectional.fromSTEB(8.0, 0.0, 8.0, 0.0),
+                        child: Text(
+                          'ME',
+                          textAlign: TextAlign.center,
+                          style:
+                              FlutterFlowTheme.of(context).bodyMedium.override(
+                                    fontFamily: 'Readex Pro',
+                                    letterSpacing: 0.0,
+                                  ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
-      ),
-      onEnter: ((event) async {
-        setState(() => _model.iuserHovered = true);
-      }),
-      onExit: ((event) async {
-        setState(() => _model.iuserHovered = false);
-      }),
+        onEnter: ((event) async {
+          setState(() => _model.iuserHovered = true);
+        }),
+        onExit: ((event) async {
+          setState(() => _model.iuserHovered = false);
+        }),
       ),
     );
   }

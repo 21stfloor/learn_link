@@ -1,6 +1,8 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/common/drawer_toggle/drawer_toggle_widget.dart';
+import '/components/milestone_list_widget.dart';
+import '/components/subscription_payment_select_widget.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -13,7 +15,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:webviewx_plus/webviewx_plus.dart';
 import 'teacher_my_schedules_page_model.dart';
 export 'teacher_my_schedules_page_model.dart';
 
@@ -59,6 +60,8 @@ class _TeacherMySchedulesPageWidgetState
 
   @override
   Widget build(BuildContext context) {
+    context.watch<FFAppState>();
+
     return GestureDetector(
       onTap: () => _model.unfocusNode.canRequestFocus
           ? FocusScope.of(context).requestFocus(_model.unfocusNode)
@@ -68,12 +71,10 @@ class _TeacherMySchedulesPageWidgetState
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
         drawer: Drawer(
           elevation: 16.0,
-          child: WebViewAware(
-            child: wrapWithModel(
-              model: _model.teacherSidebarModel,
-              updateCallback: () => setState(() {}),
-              child: TeacherSidebarWidget(),
-            ),
+          child: wrapWithModel(
+            model: _model.teacherSidebarModel,
+            updateCallback: () => setState(() {}),
+            child: TeacherSidebarWidget(),
           ),
         ),
         body: SafeArea(
@@ -87,16 +88,13 @@ class _TeacherMySchedulesPageWidgetState
                 phone: false,
                 tablet: false,
               ))
-                Flexible(
-                  flex: 1,
-                  child: wrapWithModel(
-                    model: _model.drawerToggleModel,
-                    updateCallback: () => setState(() {}),
-                    child: DrawerToggleWidget(),
-                  ),
+                wrapWithModel(
+                  model: _model.drawerToggleModel,
+                  updateCallback: () => setState(() {}),
+                  child: DrawerToggleWidget(),
                 ),
               Expanded(
-                flex: 9,
+                flex: 10,
                 child: Align(
                   alignment: AlignmentDirectional(0.0, 0.0),
                   child: Padding(
@@ -104,9 +102,6 @@ class _TeacherMySchedulesPageWidgetState
                     child: Container(
                       width: MediaQuery.sizeOf(context).width * 1.0,
                       height: MediaQuery.sizeOf(context).height * 1.0,
-                      constraints: BoxConstraints(
-                        maxWidth: 1170.0,
-                      ),
                       decoration: BoxDecoration(
                         color: FlutterFlowTheme.of(context).secondaryBackground,
                         boxShadow: [
@@ -171,73 +166,158 @@ class _TeacherMySchedulesPageWidgetState
                                   ),
                                 ),
                                 Builder(
-                                  builder: (context) => FFButtonWidget(
-                                    onPressed: () async {
-                                      await showDialog(
-                                        barrierDismissible: false,
-                                        context: context,
-                                        builder: (dialogContext) {
-                                          return Dialog(
-                                            elevation: 0,
-                                            insetPadding: EdgeInsets.zero,
-                                            backgroundColor: Colors.transparent,
-                                            alignment: AlignmentDirectional(
-                                                    0.0, 0.0)
-                                                .resolve(
-                                                    Directionality.of(context)),
-                                            child: WebViewAware(
-                                              child: GestureDetector(
-                                                onTap: () => _model.unfocusNode
-                                                        .canRequestFocus
-                                                    ? FocusScope.of(context)
-                                                        .requestFocus(
-                                                            _model.unfocusNode)
-                                                    : FocusScope.of(context)
-                                                        .unfocus(),
-                                                child: Container(
-                                                  height: 600.0,
-                                                  width: 360.0,
-                                                  child:
-                                                      ScheduleEditDialogWidget(),
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ).then((value) => setState(() {}));
-                                    },
-                                    text: 'Add New',
-                                    icon: Icon(
-                                      Icons.add_rounded,
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryBackground,
-                                      size: 15.0,
-                                    ),
-                                    options: FFButtonOptions(
-                                      height: 40.0,
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          16.0, 0.0, 16.0, 0.0),
-                                      iconPadding:
-                                          EdgeInsetsDirectional.fromSTEB(
-                                              0.0, 0.0, 0.0, 0.0),
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryText,
-                                      textStyle: FlutterFlowTheme.of(context)
-                                          .titleSmall
-                                          .override(
-                                            fontFamily: 'Readex Pro',
+                                  builder: (context) {
+                                    if (FFAppState().subscribed) {
+                                      return Builder(
+                                        builder: (context) => FFButtonWidget(
+                                          onPressed: () async {
+                                            await showDialog(
+                                              barrierDismissible: false,
+                                              context: context,
+                                              builder: (dialogContext) {
+                                                return Dialog(
+                                                  elevation: 0,
+                                                  insetPadding: EdgeInsets.zero,
+                                                  backgroundColor:
+                                                      Colors.transparent,
+                                                  alignment:
+                                                      AlignmentDirectional(
+                                                              0.0, 0.0)
+                                                          .resolve(
+                                                              Directionality.of(
+                                                                  context)),
+                                                  child: GestureDetector(
+                                                    onTap: () => _model
+                                                            .unfocusNode
+                                                            .canRequestFocus
+                                                        ? FocusScope.of(context)
+                                                            .requestFocus(_model
+                                                                .unfocusNode)
+                                                        : FocusScope.of(context)
+                                                            .unfocus(),
+                                                    child:
+                                                        ScheduleEditDialogWidget(),
+                                                  ),
+                                                );
+                                              },
+                                            ).then((value) => setState(() {}));
+                                          },
+                                          text: 'Add New',
+                                          icon: Icon(
+                                            Icons.add_rounded,
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryBackground,
-                                            letterSpacing: 0.0,
+                                            size: 15.0,
                                           ),
-                                      elevation: 3.0,
-                                      borderSide: BorderSide(
-                                        color: Colors.transparent,
-                                        width: 1.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                  ),
+                                          options: FFButtonOptions(
+                                            height: 40.0,
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    16.0, 0.0, 16.0, 0.0),
+                                            iconPadding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    0.0, 0.0, 0.0, 0.0),
+                                            color: FlutterFlowTheme.of(context)
+                                                .primaryText,
+                                            textStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .titleSmall
+                                                    .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      color: FlutterFlowTheme
+                                                              .of(context)
+                                                          .secondaryBackground,
+                                                      letterSpacing: 0.0,
+                                                    ),
+                                            elevation: 3.0,
+                                            borderSide: BorderSide(
+                                              color: Colors.transparent,
+                                              width: 1.0,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      return Builder(
+                                        builder: (context) => FFButtonWidget(
+                                          onPressed: () async {
+                                            await showDialog(
+                                              context: context,
+                                              builder: (dialogContext) {
+                                                return Dialog(
+                                                  elevation: 0,
+                                                  insetPadding: EdgeInsets.zero,
+                                                  backgroundColor:
+                                                      Colors.transparent,
+                                                  alignment:
+                                                      AlignmentDirectional(
+                                                              0.0, 0.0)
+                                                          .resolve(
+                                                              Directionality.of(
+                                                                  context)),
+                                                  child: GestureDetector(
+                                                    onTap: () => _model
+                                                            .unfocusNode
+                                                            .canRequestFocus
+                                                        ? FocusScope.of(context)
+                                                            .requestFocus(_model
+                                                                .unfocusNode)
+                                                        : FocusScope.of(context)
+                                                            .unfocus(),
+                                                    child:
+                                                        SubscriptionPaymentSelectWidget(
+                                                      role: valueOrDefault(
+                                                          currentUserDocument
+                                                              ?.role,
+                                                          ''),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ).then((value) => setState(() {}));
+                                          },
+                                          text: 'Subscribe to unlock',
+                                          icon: Icon(
+                                            Icons.stars_sharp,
+                                            size: 15.0,
+                                          ),
+                                          options: FFButtonOptions(
+                                            width: 200.0,
+                                            height: 40.0,
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    0.0, 0.0, 0.0, 0.0),
+                                            iconPadding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    0.0, 0.0, 0.0, 0.0),
+                                            color: FlutterFlowTheme.of(context)
+                                                .accent3,
+                                            textStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .titleSmall
+                                                    .override(
+                                                      fontFamily:
+                                                          'Plus Jakarta Sans',
+                                                      color: Color(0xFF14181B),
+                                                      fontSize: 16.0,
+                                                      letterSpacing: 0.0,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                            elevation: 0.0,
+                                            borderSide: BorderSide(
+                                              color: Color(0xFF4B39EF),
+                                              width: 2.0,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
                                 ),
                               ],
                             ),
@@ -261,7 +341,7 @@ class _TeacherMySchedulesPageWidgetState
                                           alignment:
                                               AlignmentDirectional(0.0, 0.0),
                                           child: Container(
-                                            width: 920.0,
+                                            width: 1024.0,
                                             height: MediaQuery.sizeOf(context)
                                                     .height *
                                                 1.0,
@@ -401,6 +481,21 @@ class _TeacherMySchedulesPageWidgetState
                                                           Expanded(
                                                             flex: 3,
                                                             child: Text(
+                                                              'Status',
+                                                              style: FlutterFlowTheme
+                                                                      .of(context)
+                                                                  .bodyMedium
+                                                                  .override(
+                                                                    fontFamily:
+                                                                        'Readex Pro',
+                                                                    letterSpacing:
+                                                                        0.0,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 4,
+                                                            child: Text(
                                                               'Actions',
                                                               textAlign:
                                                                   TextAlign
@@ -456,6 +551,7 @@ class _TeacherMySchedulesPageWidgetState
                                                     List<SchedulesRecord>
                                                         listViewSchedulesRecordList =
                                                         snapshot.data!;
+
                                                     return ListView.builder(
                                                       padding: EdgeInsets.zero,
                                                       shrinkWrap: true,
@@ -616,119 +712,204 @@ class _TeacherMySchedulesPageWidgetState
                                                                   ),
                                                                   Expanded(
                                                                     flex: 3,
-                                                                    child: Row(
-                                                                      mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .max,
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: [
+                                                                    child: Text(
+                                                                      listViewSchedulesRecord
+                                                                              .done
+                                                                          ? 'Completed'
+                                                                          : 'Ongoing',
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .bodyMedium
+                                                                          .override(
+                                                                            fontFamily:
+                                                                                'Readex Pro',
+                                                                            letterSpacing:
+                                                                                0.0,
+                                                                          ),
+                                                                    ),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 4,
+                                                                    child:
                                                                         Builder(
-                                                                          builder: (context) =>
+                                                                      builder:
+                                                                          (context) {
+                                                                        if (FFAppState()
+                                                                            .subscribed) {
+                                                                          return Row(
+                                                                            mainAxisSize:
+                                                                                MainAxisSize.max,
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            children: [
+                                                                              Builder(
+                                                                                builder: (context) => FlutterFlowIconButton(
+                                                                                  borderColor: Colors.transparent,
+                                                                                  borderRadius: 30.0,
+                                                                                  borderWidth: 1.0,
+                                                                                  buttonSize: 44.0,
+                                                                                  icon: Icon(
+                                                                                    Icons.edit,
+                                                                                    color: FlutterFlowTheme.of(context).secondaryText,
+                                                                                    size: 20.0,
+                                                                                  ),
+                                                                                  onPressed: () async {
+                                                                                    await showDialog(
+                                                                                      barrierDismissible: false,
+                                                                                      context: context,
+                                                                                      builder: (dialogContext) {
+                                                                                        return Dialog(
+                                                                                          elevation: 0,
+                                                                                          insetPadding: EdgeInsets.zero,
+                                                                                          backgroundColor: Colors.transparent,
+                                                                                          alignment: AlignmentDirectional(0.0, 0.0).resolve(Directionality.of(context)),
+                                                                                          child: GestureDetector(
+                                                                                            onTap: () => _model.unfocusNode.canRequestFocus ? FocusScope.of(context).requestFocus(_model.unfocusNode) : FocusScope.of(context).unfocus(),
+                                                                                            child: ScheduleEditDialogWidget(
+                                                                                              scheduleToEdit: listViewSchedulesRecord,
+                                                                                            ),
+                                                                                          ),
+                                                                                        );
+                                                                                      },
+                                                                                    ).then((value) => setState(() {}));
+                                                                                  },
+                                                                                ),
+                                                                              ),
+                                                                              Builder(
+                                                                                builder: (context) => FlutterFlowIconButton(
+                                                                                  borderColor: Colors.transparent,
+                                                                                  borderRadius: 30.0,
+                                                                                  borderWidth: 1.0,
+                                                                                  buttonSize: 44.0,
+                                                                                  icon: Icon(
+                                                                                    Icons.flag,
+                                                                                    color: FlutterFlowTheme.of(context).secondaryText,
+                                                                                    size: 20.0,
+                                                                                  ),
+                                                                                  onPressed: () async {
+                                                                                    await showDialog(
+                                                                                      barrierDismissible: false,
+                                                                                      context: context,
+                                                                                      builder: (dialogContext) {
+                                                                                        return Dialog(
+                                                                                          elevation: 0,
+                                                                                          insetPadding: EdgeInsets.zero,
+                                                                                          backgroundColor: Colors.transparent,
+                                                                                          alignment: AlignmentDirectional(0.0, 0.0).resolve(Directionality.of(context)),
+                                                                                          child: GestureDetector(
+                                                                                            onTap: () => _model.unfocusNode.canRequestFocus ? FocusScope.of(context).requestFocus(_model.unfocusNode) : FocusScope.of(context).unfocus(),
+                                                                                            child: MilestoneListWidget(
+                                                                                              schedule: listViewSchedulesRecord,
+                                                                                            ),
+                                                                                          ),
+                                                                                        );
+                                                                                      },
+                                                                                    ).then((value) => setState(() {}));
+                                                                                  },
+                                                                                ),
+                                                                              ),
                                                                               FlutterFlowIconButton(
-                                                                            borderColor:
-                                                                                Colors.transparent,
-                                                                            borderRadius:
-                                                                                30.0,
-                                                                            borderWidth:
-                                                                                1.0,
-                                                                            buttonSize:
-                                                                                44.0,
-                                                                            icon:
-                                                                                Icon(
-                                                                              Icons.edit,
-                                                                              color: FlutterFlowTheme.of(context).secondaryText,
-                                                                              size: 20.0,
-                                                                            ),
-                                                                            onPressed:
-                                                                                () async {
-                                                                              await showDialog(
-                                                                                barrierDismissible: false,
-                                                                                context: context,
-                                                                                builder: (dialogContext) {
-                                                                                  return Dialog(
-                                                                                    elevation: 0,
-                                                                                    insetPadding: EdgeInsets.zero,
-                                                                                    backgroundColor: Colors.transparent,
-                                                                                    alignment: AlignmentDirectional(0.0, 0.0).resolve(Directionality.of(context)),
-                                                                                    child: WebViewAware(
-                                                                                      child: GestureDetector(
-                                                                                        onTap: () => _model.unfocusNode.canRequestFocus ? FocusScope.of(context).requestFocus(_model.unfocusNode) : FocusScope.of(context).unfocus(),
-                                                                                        child: Container(
-                                                                                          height: 600.0,
-                                                                                          width: 360.0,
-                                                                                          child: ScheduleEditDialogWidget(
-                                                                                            schedule: listViewSchedulesRecord,
+                                                                                borderColor: Colors.transparent,
+                                                                                borderRadius: 30.0,
+                                                                                borderWidth: 1.0,
+                                                                                buttonSize: 44.0,
+                                                                                icon: Icon(
+                                                                                  Icons.delete_forever_outlined,
+                                                                                  color: FlutterFlowTheme.of(context).error,
+                                                                                  size: 20.0,
+                                                                                ),
+                                                                                onPressed: () async {
+                                                                                  var confirmDialogResponse = await showDialog<bool>(
+                                                                                        context: context,
+                                                                                        builder: (alertDialogContext) {
+                                                                                          return AlertDialog(
+                                                                                            title: Text('Confirm'),
+                                                                                            content: Text('Are you sure you want to delete this schedule?'),
+                                                                                            actions: [
+                                                                                              TextButton(
+                                                                                                onPressed: () => Navigator.pop(alertDialogContext, false),
+                                                                                                child: Text('Cancel'),
+                                                                                              ),
+                                                                                              TextButton(
+                                                                                                onPressed: () => Navigator.pop(alertDialogContext, true),
+                                                                                                child: Text('Confirm'),
+                                                                                              ),
+                                                                                            ],
+                                                                                          );
+                                                                                        },
+                                                                                      ) ??
+                                                                                      false;
+                                                                                  if (confirmDialogResponse) {
+                                                                                    await listViewSchedulesRecord.reference.delete();
+                                                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                                                      SnackBar(
+                                                                                        content: Text(
+                                                                                          'Schedule was deleted successfully',
+                                                                                          style: TextStyle(
+                                                                                            color: FlutterFlowTheme.of(context).primaryText,
                                                                                           ),
                                                                                         ),
+                                                                                        duration: Duration(milliseconds: 4000),
+                                                                                        backgroundColor: FlutterFlowTheme.of(context).secondary,
                                                                                       ),
-                                                                                    ),
-                                                                                  );
+                                                                                    );
+                                                                                  }
                                                                                 },
-                                                                              ).then((value) => setState(() {}));
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                        FlutterFlowIconButton(
-                                                                          borderColor:
-                                                                              Colors.transparent,
-                                                                          borderRadius:
-                                                                              30.0,
-                                                                          borderWidth:
-                                                                              1.0,
-                                                                          buttonSize:
-                                                                              44.0,
-                                                                          icon:
-                                                                              Icon(
-                                                                            Icons.delete_forever_outlined,
-                                                                            color:
-                                                                                FlutterFlowTheme.of(context).error,
-                                                                            size:
-                                                                                20.0,
-                                                                          ),
-                                                                          onPressed:
-                                                                              () async {
-                                                                            var confirmDialogResponse = await showDialog<bool>(
+                                                                              ),
+                                                                            ],
+                                                                          );
+                                                                        } else {
+                                                                          return Builder(
+                                                                            builder: (context) =>
+                                                                                FFButtonWidget(
+                                                                              onPressed: () async {
+                                                                                await showDialog(
                                                                                   context: context,
-                                                                                  builder: (alertDialogContext) {
-                                                                                    return WebViewAware(
-                                                                                      child: AlertDialog(
-                                                                                        title: Text('Confirm'),
-                                                                                        content: Text('Are you sure you want to delete this schedule?'),
-                                                                                        actions: [
-                                                                                          TextButton(
-                                                                                            onPressed: () => Navigator.pop(alertDialogContext, false),
-                                                                                            child: Text('Cancel'),
-                                                                                          ),
-                                                                                          TextButton(
-                                                                                            onPressed: () => Navigator.pop(alertDialogContext, true),
-                                                                                            child: Text('Confirm'),
-                                                                                          ),
-                                                                                        ],
+                                                                                  builder: (dialogContext) {
+                                                                                    return Dialog(
+                                                                                      elevation: 0,
+                                                                                      insetPadding: EdgeInsets.zero,
+                                                                                      backgroundColor: Colors.transparent,
+                                                                                      alignment: AlignmentDirectional(0.0, 0.0).resolve(Directionality.of(context)),
+                                                                                      child: GestureDetector(
+                                                                                        onTap: () => _model.unfocusNode.canRequestFocus ? FocusScope.of(context).requestFocus(_model.unfocusNode) : FocusScope.of(context).unfocus(),
+                                                                                        child: SubscriptionPaymentSelectWidget(
+                                                                                          role: valueOrDefault(currentUserDocument?.role, ''),
+                                                                                        ),
                                                                                       ),
                                                                                     );
                                                                                   },
-                                                                                ) ??
-                                                                                false;
-                                                                            if (confirmDialogResponse) {
-                                                                              await listViewSchedulesRecord.reference.delete();
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                SnackBar(
-                                                                                  content: Text(
-                                                                                    'Schedule was deleted successfully',
-                                                                                    style: TextStyle(
-                                                                                      color: FlutterFlowTheme.of(context).primaryText,
+                                                                                ).then((value) => setState(() {}));
+                                                                              },
+                                                                              text: 'Subscribe to unlock',
+                                                                              icon: Icon(
+                                                                                Icons.stars_sharp,
+                                                                                size: 15.0,
+                                                                              ),
+                                                                              options: FFButtonOptions(
+                                                                                width: 200.0,
+                                                                                height: 40.0,
+                                                                                padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                                                                                iconPadding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                                                                                color: FlutterFlowTheme.of(context).accent3,
+                                                                                textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                                                                                      fontFamily: 'Plus Jakarta Sans',
+                                                                                      color: Color(0xFF14181B),
+                                                                                      fontSize: 16.0,
+                                                                                      letterSpacing: 0.0,
+                                                                                      fontWeight: FontWeight.bold,
                                                                                     ),
-                                                                                  ),
-                                                                                  duration: Duration(milliseconds: 4000),
-                                                                                  backgroundColor: FlutterFlowTheme.of(context).secondary,
+                                                                                elevation: 0.0,
+                                                                                borderSide: BorderSide(
+                                                                                  color: Color(0xFF4B39EF),
+                                                                                  width: 2.0,
                                                                                 ),
-                                                                              );
-                                                                            }
-                                                                          },
-                                                                        ),
-                                                                      ],
+                                                                                borderRadius: BorderRadius.circular(12.0),
+                                                                              ),
+                                                                            ),
+                                                                          );
+                                                                        }
+                                                                      },
                                                                     ),
                                                                   ),
                                                                 ],
